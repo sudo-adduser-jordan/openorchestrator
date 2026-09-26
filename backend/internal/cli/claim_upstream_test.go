@@ -29,7 +29,7 @@ func TestClaimCommandsCanonicalRepository(t *testing.T) {
 						case r.Method == http.MethodGet && r.URL.Path == "/api/v1/sessions/demo-1":
 							_, _ = io.WriteString(w, `{"session":`+sessionJSON("demo-1", "demo", "worker", "working", false)+`}`)
 						case r.URL.Path == "/api/v1/agents/readiness/ensure":
-							_, _ = io.WriteString(w, authorizedAgentsJSON("codex"))
+							_, _ = io.WriteString(w, authorizedAgentsJSON("opencode"))
 						case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 							_, _ = io.WriteString(w, `{"session":{"id":"demo-1","status":"idle"}}`)
 						case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions/demo-1/pr/claim":
@@ -43,7 +43,7 @@ func TestClaimCommandsCanonicalRepository(t *testing.T) {
 					writeRunFileFor(t, cfg, srv)
 					args := []string{"session", "claim-pr", "demo-1", ref}
 					if spawn {
-						args = []string{"spawn", "--project", "demo", "--agent", "codex", "--name", "worker", "--claim-pr", ref}
+						args = []string{"spawn", "--project", "demo", "--agent", "opencode", "--name", "worker", "--claim-pr", ref}
 					}
 					_, _, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, args...)
 					if err != nil {

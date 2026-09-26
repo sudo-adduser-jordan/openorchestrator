@@ -56,7 +56,7 @@ export const DOWNLOAD_URL_LINUX = "https://github.com/sudo-adduser-jordan/open-a
 export const AGENT_HARNESSES = 24;
 export const TAGLINE = "Stop babysitting agents. Start merging real work.";
 export const HERO_SUBHEADLINE = "Run a fleet of coding agents while keeping branches, reviews, and CI failures manageable.";
-export const HERO_SECONDARY_SUBHEADLINE = "Isolated workspaces for Codex, OpenCode, and any CLI agent. Review every change from one dashboard. Free and open source.";
+export const HERO_SECONDARY_SUBHEADLINE = "Isolated workspaces for OpenCode, OpenCode, and any CLI agent. Review every change from one dashboard. Free and open source.";
 
 export const NAV_ITEMS = [
   { label: "Demo", href: "/#see-it" },

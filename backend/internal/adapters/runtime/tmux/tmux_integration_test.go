@@ -299,7 +299,7 @@ func TestRuntimeIntegrationSupervisedExitKeepsInteractiveShell(t *testing.T) {
 		time.Sleep(100 * time.Millisecond)
 	}
 
-	// The helper exits normally, matching Codex /exit or EOF. The launch shell
+	// The helper exits normally, matching OpenCode /exit or EOF. The launch shell
 	// must then execute Open Agents's keep-alive interactive shell.
 	deadline = time.Now().Add(5 * time.Second)
 	for {

@@ -160,7 +160,7 @@ func TestReviewsTrigger_MissingReviewerBinaryReturns422WithCause(t *testing.T) {
 
 	var got errorBody
 	mustJSON(t, body, &got)
-	if !strings.Contains(got.Message, "codex") || !strings.Contains(got.Message, ports.ErrAgentBinaryNotFound.Error()) {
+	if !strings.Contains(got.Message, "opencode") || !strings.Contains(got.Message, ports.ErrAgentBinaryNotFound.Error()) {
 		t.Fatalf("message = %q, want reviewer binary cause", got.Message)
 	}
 }

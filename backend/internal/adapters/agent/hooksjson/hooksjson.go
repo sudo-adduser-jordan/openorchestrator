@@ -162,7 +162,7 @@ type HookSpec struct {
 // hooks file. Construct one per adapter with its file path, command prefix,
 // per-hook timeout, and managed hook set.
 type Manager struct {
-	// Label prefixes error messages, e.g. "codex" or "goose", so the
+	// Label prefixes error messages, e.g. "opencode" or "goose", so the
 	// wrapped error reads "<label>.GetAgentHooks: ...".
 	Label string
 	// CommandPrefix identifies Open Agents-owned hook commands, e.g. "open-agents hooks goose ".

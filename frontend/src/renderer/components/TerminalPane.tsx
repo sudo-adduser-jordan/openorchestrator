@@ -779,7 +779,7 @@ function workerPreviewLines(session: WorkspaceSession | undefined, provider: str
 	if (session?.id === "demo-ci-failed") {
 		return [
 			"╭────────────────────────────────────────────╮",
-			"│ >_ OpenAI Codex (v0.133.0)                 │",
+			"│ >_ OpenAI opencode (v0.133.0)                 │",
 			"│ model:        gpt-5.5 high  /model to change",
 			"│ directory:    ~/open-agents-demo/demo-new-task-flake",
 			"│ permissions:  YOLO mode                    │",

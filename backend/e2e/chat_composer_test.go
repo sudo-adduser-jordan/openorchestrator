@@ -75,7 +75,7 @@ func TestChatSkillsAreRefusedForATUISession(t *testing.T) {
 	project := seedProject(t, d, "skillstui")
 
 	tui := spawn(t, d, map[string]any{
-		"projectId": project, "kind": "worker", "harness": "codex", "mode": "tui",
+		"projectId": project, "kind": "worker", "harness": "opencode", "mode": "tui",
 		"prompt": "do nothing",
 	}).Session.ID
 

@@ -245,7 +245,7 @@ func TestSessionGetUsesLatestCurrentHeadRunPerHarness(t *testing.T) {
 		t.Fatal(err)
 	}
 	if err := st.UpsertReview(ctx, domain.Review{
-		ID: "rev", SessionID: rec.ID, ProjectID: "mer", Harness: "codex",
+		ID: "rev", SessionID: rec.ID, ProjectID: "mer", Harness: "opencode",
 		PRURL: "pr/1", CreatedAt: now, UpdatedAt: now,
 	}); err != nil {
 		t.Fatal(err)
@@ -253,7 +253,7 @@ func TestSessionGetUsesLatestCurrentHeadRunPerHarness(t *testing.T) {
 	insert := func(id string, createdAt time.Time, verdict domain.ReviewVerdict) {
 		t.Helper()
 		if err := st.InsertReviewRun(ctx, domain.ReviewRun{
-			ID: id, ReviewID: "rev", SessionID: rec.ID, Harness: "codex",
+			ID: id, ReviewID: "rev", SessionID: rec.ID, Harness: "opencode",
 			PRURL: "pr/1", TargetSHA: "head1", Status: domain.ReviewRunComplete,
 			Verdict: verdict, CreatedAt: createdAt, AutoInjectReview: true,
 		}); err != nil {

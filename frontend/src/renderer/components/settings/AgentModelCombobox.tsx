@@ -3,7 +3,6 @@ import { type ReactNode, useCallback, useLayoutEffect, useMemo, useRef, useState
 import type { AgentModelCatalog } from "../../hooks/useAgentModelsQuery";
 import { useSuppressStrayFocusRing } from "../../hooks/useSuppressStrayFocusRing";
 import { cn } from "../../lib/utils";
-import { useModelTuning, type ModelTuningControlsProps } from "./ModelTuningControls";
 import { OptionMenuItem, OptionMenuSub, OptionMenuSubContent, OptionMenuSubTrigger } from "../ui/option-menu";
 import {
 	DropdownMenu,
@@ -18,15 +17,6 @@ const MAX_VISIBLE_MODELS = 50;
 const MODEL_SEARCH_THRESHOLD = 10;
 const MAX_RECENT_MODELS = 3;
 const RECENT_MODELS_STORAGE_KEY = "open-agents.recentModels.v1";
-const ignoreEffortChange = () => {};
-
-export type ModelEffortSelection = Pick<ModelTuningControlsProps,
-	"effort" | "onEffortChange" | "onEffortReset" | "onValidityChange" | "roleLabel"
->;
-
-function effortLabel(value: string) {
-	return value === "xhigh" ? "Extra high" : value.charAt(0).toUpperCase() + value.slice(1);
-}
 
 type AgentModel = NonNullable<AgentModelCatalog["models"]>[number];
 
@@ -70,7 +60,6 @@ export function AgentModelCombobox({
 	renderTrigger,
 	recentScope,
 	compact = false,
-	tuning,
 	disabled = false,
 	"aria-label": ariaLabel,
 }: {
@@ -82,7 +71,7 @@ export function AgentModelCombobox({
 	onRefresh?: () => void | Promise<void>;
 	onChange: (value: string) => void;
 	onCustom: (value: string) => void;
-	/** Names what happens with no override, e.g. "Use codex's default". */
+	/** Names what happens with no override, e.g. "Use opencode's default". */
 	emptyLabel?: string;
 	triggerLabel?: string;
 	triggerClassName?: string;
@@ -96,22 +85,10 @@ export function AgentModelCombobox({
 	 *  contexts where the menu should read like a simple choice, not a
 	 *  model-management surface. */
 	compact?: boolean;
-	/** Codex callers opt into a combined model and reasoning-effort menu. */
-	tuning?: ModelEffortSelection;
 	disabled?: boolean;
 	"aria-label": string;
 }) {
-	const { selected: effortModel, invalidEffort } = useModelTuning({
-		models,
-		model: value,
-		effort: tuning?.effort ?? "",
-		onEffortChange: tuning?.onEffortChange ?? ignoreEffortChange,
-		onEffortReset: tuning?.onEffortReset,
-		onValidityChange: tuning?.onValidityChange,
-	});
-	const showEffort = Boolean(tuning && (effortModel?.efforts?.length || tuning.effort));
-	const currentEffortLabel = tuning?.effort ? effortLabel(tuning.effort) : "Provider default";
-	const entryMode = customModelEntry ?? (allowCustom ? "direct" : "none");
+				const entryMode = customModelEntry ?? (allowCustom ? "direct" : "none");
 	const allowDirectCustom = entryMode === "direct";
 	const [search, setSearch] = useState("");
 	const [menuOpen, setMenuOpen] = useState(false);
@@ -224,7 +201,6 @@ export function AgentModelCombobox({
 					) : (
 						<span className="min-w-0 truncate">{currentLabel}</span>
 					)}
-					{showEffort && <span className="shrink-0 text-settings-muted"> · {currentEffortLabel}</span>}
 					<ChevronDown
 						className="size-icon-sm shrink-0 opacity-70 transition-transform duration-300 ease-out group-data-[state=open]/agent-model-trigger:rotate-180"
 						aria-hidden="true"
@@ -260,9 +236,9 @@ export function AgentModelCombobox({
 						onScroll={updateScrollCue}
 					>
 						{normalizedSearch === "" && (
-							<DropdownMenuItem onSelect={() => onChange("")} className={modelItemClass(value === "")} aria-current={tuning && value === "" ? true : undefined}>
+							<DropdownMenuItem onSelect={() => onChange("")} className={modelItemClass(value === "")} aria-current={false}>
 								{noOverrideLabel}
-								{tuning && value === "" && <Check className="ml-auto size-icon-sm shrink-0" aria-hidden="true" />}
+								
 							</DropdownMenuItem>
 						)}
 
@@ -276,10 +252,10 @@ export function AgentModelCombobox({
 											key={item.id}
 											onSelect={() => selectModel(item.id)}
 											className={modelItemClass(item.id === value)}
-											aria-current={tuning && item.id === value ? true : undefined}
+											aria-current={false}
 										>
 											<span className="truncate text-settings-label">{item.label}</span>
-											{tuning && item.id === value && <Check className="ml-auto size-icon-sm shrink-0" aria-hidden="true" />}
+											
 										</DropdownMenuItem>
 									) : (
 										<DropdownMenuItem

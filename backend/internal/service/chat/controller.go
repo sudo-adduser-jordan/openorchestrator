@@ -1095,7 +1095,7 @@ func (index *nativeHistoryTurnIndex) mapReplay(events []ports.ChatEvent) (map[st
 // the client's id, while others persist their own user uuid. Assistant/tool item
 // ids are usually replay-stable, so they are the strongest cross-restart signal;
 // the original client id is next, and exact prompt text in conversation order is
-// the compatibility fallback. This belongs above every driver: Codex history is
+// the compatibility fallback. This belongs above every driver: opencode history is
 // already identity-stable, while all ACP bindings need the same reconciliation.
 func reconcileNativeHistory(
 	events []ports.ChatEvent,
@@ -1126,7 +1126,7 @@ func reconcileNativeHistory(
 		return match
 	}
 	// A native provider may omit persisted item ids even though its live stream
-	// supplied them. Codex does this today: a live assistant message can be
+	// supplied them. opencode does this today: a live assistant message can be
 	// `msg_...`, while thread/read later calls the same item `item-2`. Stable turn
 	// identity still tells us which Open Agents turn owns the replay, so suppress already
 	// projected message/activity facts by semantic fingerprint. Counts preserve
@@ -1519,7 +1519,6 @@ func (c *Controller) turnSettings() ports.ChatTurnSettings {
 	current := c.Settings()
 	return ports.ChatTurnSettings{
 		Model:    current.Model,
-		Effort:   current.ReasoningEffort,
 		Approval: current.ApprovalMode,
 	}
 }
@@ -2621,7 +2620,7 @@ func (c *Controller) projectEvent(ctx context.Context, event ports.ChatEvent) (b
 }
 
 // applyCommittedTurnLifecycle updates the controller's volatile ownership only
-// after the matching durable projection commits. Codex streams events for nested
+// after the matching durable projection commits. opencode streams events for nested
 // child threads over the root connection, so only events from the conversation Open Agents
 // opened are allowed to claim or release the primary turn.
 func (c *Controller) applyCommittedTurnLifecycle(event ports.ChatEvent) bool {

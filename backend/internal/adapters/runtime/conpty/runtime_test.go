@@ -71,7 +71,7 @@ func TestRegistryResolutionHonorsCallerCancellation(t *testing.T) {
 	cancel()
 
 	_, createErr := rt.Create(ctx, ports.RuntimeConfig{
-		SessionID: "sess-cancelled", WorkspacePath: t.TempDir(), Argv: []string{"codex"},
+		SessionID: "sess-cancelled", WorkspacePath: t.TempDir(), Argv: []string{"opencode"},
 	})
 	if !errors.Is(createErr, context.Canceled) || spawnCalls != 0 {
 		t.Fatalf("Create cancelled during resolution = err %v spawnCalls %d, want context cancellation before spawn", createErr, spawnCalls)
@@ -115,7 +115,7 @@ func TestCreateAndDestroyPassCallerContextToRegistryMutations(t *testing.T) {
 	}
 
 	handle, err := rt.Create(ctx, ports.RuntimeConfig{
-		SessionID: "sess-registry-context", WorkspacePath: t.TempDir(), Argv: []string{"codex"},
+		SessionID: "sess-registry-context", WorkspacePath: t.TempDir(), Argv: []string{"opencode"},
 		Env: map[string]string{runtimeLaunchIDEnv: "registry-context-launch"},
 	})
 	if err != nil {
@@ -154,7 +154,7 @@ func TestPartialCreateCleanupFailureReturnsRuntimeEffectEvidence(t *testing.T) {
 	rt.destroyWait = 0
 
 	handle, err := rt.Create(context.Background(), ports.RuntimeConfig{
-		SessionID: "sess-partial", WorkspacePath: "/tmp/ws", Argv: []string{"codex"},
+		SessionID: "sess-partial", WorkspacePath: "/tmp/ws", Argv: []string{"opencode"},
 	})
 	if handle.ID != "" || err == nil {
 		t.Fatalf("Create partial = (%+v, %v), want empty direct handle and evidence error", handle, err)
@@ -373,7 +373,7 @@ func TestCreate_RegistersSession(t *testing.T) {
 	handle, err := rt.Create(ctx, ports.RuntimeConfig{
 		SessionID:     domain.SessionID("sess-abc"),
 		WorkspacePath: "/tmp/workspace",
-		Argv:          []string{"codex"},
+		Argv:          []string{"opencode"},
 	})
 	if err != nil {
 		t.Fatalf("Create: %v", err)
@@ -426,7 +426,7 @@ func TestCreate_RunFilePathScopesRegistryToInstanceDir(t *testing.T) {
 	handle, err := rt.Create(context.Background(), ports.RuntimeConfig{
 		SessionID:     domain.SessionID("sess-scoped"),
 		WorkspacePath: "/tmp/workspace",
-		Argv:          []string{"codex"},
+		Argv:          []string{"opencode"},
 	})
 	if err != nil {
 		t.Fatalf("Create: %v", err)

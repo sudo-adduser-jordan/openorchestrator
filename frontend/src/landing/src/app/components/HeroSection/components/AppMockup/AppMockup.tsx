@@ -93,7 +93,7 @@ const SIDEBAR_DEFAULT_WIDTH = 208;
 
 const previewAgents = {
 	qwen: { agent: "Qwen Code", icon: "/app-icons/agents/qwen.png" },
-	codex: { agent: "Codex", icon: "/app-icons/agents/codex.svg" },
+	opencode: { agent: "OpenCode", icon: "/app-icons/agents/opencode.svg" },
 	cursor: { agent: "Cursor", icon: "/app-icons/agents/cursor.svg" },
 	opencode: { agent: "OpenCode", icon: "/app-icons/agents/opencode.svg" },
 	copilot: { agent: "Copilot", icon: "/app-icons/agents/copilot-color.svg" },
@@ -211,8 +211,8 @@ const columns = [
 			{
 				title: "Wire hero mockup progression delays",
 				branch: "landing/progression-timing",
-				agent: previewAgents.codex.agent,
-				icon: previewAgents.codex.icon,
+				agent: previewAgents.opencode.agent,
+				icon: previewAgents.opencode.icon,
 				activity: "Tuning interval jitter",
 				activityState: "running",
 				pr: "PR #331",
@@ -329,7 +329,7 @@ function previewCard(
 	> &
 		Partial<StaticPreviewCard> & { agentKey?: PreviewAgentKey },
 ): StaticPreviewCard {
-	const { agentKey = "codex", ...rest } = card;
+	const { agentKey = "opencode", ...rest } = card;
 	const defaults = previewAgents[agentKey];
 	return {
 		agent: defaults.agent,
@@ -482,7 +482,7 @@ const trackCardTemplates: Record<TrackId, StaticPreviewCard[]> = {
 			activity: "Queued",
 			activityState: "passed",
 			pr: "draft",
-			agentKey: "codex",
+			agentKey: "opencode",
 		}),
 		previewCard({
 			title: "Confirm final demo video caption",
@@ -554,7 +554,7 @@ const landingIncomingCards: StaticPreviewCard[] = [
 	{
 		title: "Repair mobile overflow on landing preview",
 		branch: "landing/mobile-preview-overflow",
-		...previewAgents.codex,
+		...previewAgents.opencode,
 		activity: "Debugging issue",
 		activityState: "running",
 		pr: "draft",

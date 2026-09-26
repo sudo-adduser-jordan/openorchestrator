@@ -1408,7 +1408,7 @@ func buildLaunchCommand(cfg ports.RuntimeConfig) string {
 	if cfg.ExitOnCommandCompletion {
 		// Let the tmux session disappear as soon as its one backend-owned command
 		// completes. The terminal mux then emits `exited`, which drives exact
-		// post-command work such as Codex account verification.
+		// post-command work such as opencode account verification.
 		b.WriteString(`; exit $?`)
 	} else if cfg.Env["OPEN_AGENTS_SUPERVISED_PROCESS"] == "1" {
 		// cat consumes and discards any input that arrived while the supervised

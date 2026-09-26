@@ -705,7 +705,7 @@ func TestGetAgentHooksInstallsPlugin(t *testing.T) {
 		t.Fatalf("plugin subscribes to deprecated session.idle; use session.status(idle):\n%s", body)
 	}
 	// A hung `open-agents hooks` call must not block opencode forever, so each spawn is
-	// time-boxed (parity with the codex 30s hook timeout).
+	// time-boxed (parity with the opencode 30s hook timeout).
 	if !strings.Contains(body, "timeout:") {
 		t.Fatalf("plugin spawn has no timeout; a hung hook would block opencode:\n%s", body)
 	}

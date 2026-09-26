@@ -195,7 +195,7 @@ function NewTaskModal({ scene }: { scene: ProjectAgentsScene }) {
 	}, [scene.id, scene.typing, targetChars]);
 
 	const taskText = TASK_TEXT_FULL.slice(0, charCount);
-	const selectedAgent = scene.selectedAgent ?? "codex";
+	const selectedAgent = scene.selectedAgent ?? "opencode";
 	const agent = agentById(selectedAgent);
 	const showCaret = charCount < TASK_TEXT_FULL.length && scene.phase === "modal";
 
@@ -494,7 +494,7 @@ export function ProjectAgentsDemo() {
 		id: "new-task",
 		title: TASK_TEXT_FULL,
 		branch: "fix/webhook-retry-flaky",
-		icon: agentById(scene.selectedAgent ?? "codex").icon,
+		icon: agentById(scene.selectedAgent ?? "opencode").icon,
 		activity: "Writing implementation",
 		time: "just now",
 	};

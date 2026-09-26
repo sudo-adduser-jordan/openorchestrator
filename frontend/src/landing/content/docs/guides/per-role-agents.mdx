@@ -20,7 +20,7 @@ Open the project settings in the desktop app and choose the worker and manager a
 
 ```bash
 open-agents project add --path /absolute/path/to/repo \
-  --worker-agent codex \
+  --worker-agent opencode \
   --manager-agent opencode
 ```
 
@@ -29,7 +29,7 @@ For a full configuration replacement, the stored JSON shape is:
 ```json
 {
   "worker": {
-    "agent": "codex",
+    "agent": "opencode",
     "agentConfig": {
       "model": "gpt-5.4",
       "permissions": "bypass-permissions"
@@ -62,10 +62,10 @@ open-agents spawn --project my-project --kind worker \
 
 ## Choose Chat or Terminal UI
 
-- Use **Chat** for structured messages, provider activity, approvals, plans, changed files, usage, compaction, and rollback. Current native drivers cover Codex, OpenCode, and Droid.
+- Use **Chat** for structured messages, provider activity, approvals, plans, changed files, usage, compaction, and rollback. Current native drivers cover OpenCode, OpenCode, and Droid.
 - Use **Terminal UI** when you want the agent's native interface or a harness without native Chat support.
 
-Compatible Codex and OpenCode sessions expose **Open Chat** or **Open Terminal UI**. Idle sessions switch directly. When work is active, Open Agents asks whether to finish and drain it or stop and interrupt it before switching controllers.
+Compatible OpenCode and OpenCode sessions expose **Open Chat** or **Open Terminal UI**. Idle sessions switch directly. When work is active, Open Agents asks whether to finish and drain it or stop and interrupt it before switching controllers.
 
 ## Project rules
 

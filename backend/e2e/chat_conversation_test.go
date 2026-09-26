@@ -22,7 +22,7 @@ import (
 func chatSession(t *testing.T, d *daemon, project, prompt string) string {
 	t.Helper()
 	id := spawn(t, d, map[string]any{
-		"projectId": project, "kind": "worker", "harness": "codex", "mode": "chat",
+		"projectId": project, "kind": "worker", "harness": "opencode", "mode": "chat",
 		"prompt": prompt,
 	}).Session.ID
 	d.awaitConversation(id, 3*time.Minute, "the session to finish its first turn",

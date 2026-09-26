@@ -10,7 +10,7 @@ import (
 // noSignalGrace is how long after spawn/restore a session may stay silent
 // before its idle reading is downgraded to StatusNoSignal. It covers the
 // agent's TUI boot plus the gap to the first activity-bearing hook callback
-// (for Codex that is UserPromptSubmit, seconds after the auto-submitted spawn
+// (for opencode that is UserPromptSubmit, seconds after the auto-submitted spawn
 // prompt — its SessionStart hook fires earlier but carries no activity state);
 // past it, a silent session is indistinguishable from one with a broken hook
 // pipeline, and the dashboard must not claim a confident "idle".

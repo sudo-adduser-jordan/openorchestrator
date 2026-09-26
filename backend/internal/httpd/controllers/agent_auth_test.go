@@ -43,11 +43,11 @@ func newAgentAuthTestServer(t *testing.T, svc *fakeAgentAuthService) *httptest.S
 
 func TestAgentAuthListReturnsDisplaySafePlans(t *testing.T) {
 	svc := &fakeAgentAuthService{plans: []agentauth.Plan{{
-		AgentID:          "codex",
+		AgentID:          "opencode",
 		Action:           agentauth.ActionLogin,
 		LaunchMode:       agentauth.LaunchTerminal,
 		Available:        true,
-		DisplayCommand:   "codex login",
+		DisplayCommand:   "opencode login",
 		Guidance:         "Native browser flow",
 		DocumentationURL: "https://developers.openai.com/codex/auth/",
 	}}}
@@ -57,7 +57,7 @@ func TestAgentAuthListReturnsDisplaySafePlans(t *testing.T) {
 	if status != http.StatusOK {
 		t.Fatalf("GET auth-plans = %d, body=%s", status, body)
 	}
-	for _, want := range []string{`"agentId":"codex"`, `"action":"login"`, `"launchMode":"terminal"`, `"displayCommand":"codex login"`} {
+	for _, want := range []string{`"agentId":"opencode"`, `"action":"login"`, `"launchMode":"terminal"`, `"displayCommand":"opencode login"`} {
 		if !strings.Contains(string(body), want) {
 			t.Fatalf("body missing %s: %s", want, body)
 		}
@@ -96,14 +96,14 @@ func TestAgentAuthStartReturnsTerminalHandle(t *testing.T) {
 func TestAgentAuthStartIgnoresRequestBody(t *testing.T) {
 	for _, body := range []string{`{"argv":["rm","-rf"],"token":"secret"}`, `{not json`} {
 		t.Run(body, func(t *testing.T) {
-			svc := &fakeAgentAuthService{startResult: agentauth.StartResult{AgentID: "codex", Action: agentauth.ActionLogin}}
+			svc := &fakeAgentAuthService{startResult: agentauth.StartResult{AgentID: "opencode", Action: agentauth.ActionLogin}}
 			server := newAgentAuthTestServer(t, svc)
 
 			_, status, _ := doRequest(t, server, http.MethodPost, "/api/v1/agents/codex/auth", body)
 			if status != http.StatusCreated {
 				t.Fatalf("POST agent auth = %d, want %d", status, http.StatusCreated)
 			}
-			if svc.startedID != "codex" || svc.startCalls != 1 {
+			if svc.startedID != "opencode" || svc.startCalls != 1 {
 				t.Fatalf("Start calls = %d, id=%q", svc.startCalls, svc.startedID)
 			}
 		})

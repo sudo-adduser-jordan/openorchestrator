@@ -73,7 +73,7 @@ func TestStartedHostKillFailureRetainsPartialCreateEvidence(t *testing.T) {
 		return "", pid, spawnErr
 	}})
 	_, err := runtime.Create(context.Background(), ports.RuntimeConfig{
-		SessionID: "sess-kill-failed", WorkspacePath: t.TempDir(), Argv: []string{"codex"},
+		SessionID: "sess-kill-failed", WorkspacePath: t.TempDir(), Argv: []string{"opencode"},
 		Env: map[string]string{runtimeLaunchIDEnv: "launch-kill-failed"},
 	})
 	var effect ports.RuntimeEffectError
@@ -153,7 +153,7 @@ func TestCreateReservationFailureDoesNotSpawnOrClaimRuntimeEffect(t *testing.T) 
 	runtime.registerHost = func(context.Context, ptyregistry.Entry) error { return reservationErr }
 
 	_, err := runtime.Create(context.Background(), ports.RuntimeConfig{
-		SessionID: "sess-reservation-failed", WorkspacePath: t.TempDir(), Argv: []string{"codex"},
+		SessionID: "sess-reservation-failed", WorkspacePath: t.TempDir(), Argv: []string{"opencode"},
 		Env: map[string]string{runtimeLaunchIDEnv: "launch-reservation-failed"},
 	})
 	var effect ports.RuntimeEffectError
@@ -179,7 +179,7 @@ func TestDefinitiveSpawnFailureRetainsCleanupAuthorityUntilUnregisterSucceeds(t 
 	}
 
 	_, err := runtime.Create(context.Background(), ports.RuntimeConfig{
-		SessionID: "sess-cleanup-retry", WorkspacePath: t.TempDir(), Argv: []string{"codex"},
+		SessionID: "sess-cleanup-retry", WorkspacePath: t.TempDir(), Argv: []string{"opencode"},
 		Env: map[string]string{runtimeLaunchIDEnv: "launch-cleanup-retry"},
 	})
 	var effect ports.RuntimeEffectError
@@ -239,7 +239,7 @@ func TestPostStartRegistryUpdateFailureLeavesDurableUnknownReservation(t *testin
 	}
 
 	_, err := runtime.Create(context.Background(), ports.RuntimeConfig{
-		SessionID: "sess-update-failed", WorkspacePath: t.TempDir(), Argv: []string{"codex"},
+		SessionID: "sess-update-failed", WorkspacePath: t.TempDir(), Argv: []string{"opencode"},
 		Env: map[string]string{runtimeLaunchIDEnv: "launch-update-failed"},
 	})
 	var effect ports.RuntimeEffectError

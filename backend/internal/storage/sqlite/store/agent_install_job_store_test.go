@@ -16,15 +16,15 @@ func TestAgentInstallJobStoreRoundTripAndList(t *testing.T) {
 	started := time.Date(2026, 8, 31, 10, 0, 0, 0, time.UTC)
 	finished := started.Add(time.Minute)
 	want := ports.AgentInstallJobRecord{
-		Target: "codex", Status: "failed", Method: "npm", Command: "npm install -g @openai/codex",
-		ExpectedDestination: "/Users/test/.npm/bin/codex", Output: "permission denied", Error: "exit status 1",
+		Target: "opencode", Status: "failed", Method: "npm", Command: "npm install -g @openai/opencode",
+		ExpectedDestination: "/Users/test/.npm/bin/opencode", Output: "permission denied", Error: "exit status 1",
 		StartedAt: started, FinishedAt: &finished, UpdatedAt: finished,
 	}
 
 	if err := store.UpsertAgentInstallJob(ctx, want); err != nil {
 		t.Fatalf("upsert job: %v", err)
 	}
-	got, ok, err := store.GetAgentInstallJob(ctx, "codex")
+	got, ok, err := store.GetAgentInstallJob(ctx, "opencode")
 	if err != nil {
 		t.Fatalf("get job: %v", err)
 	}
@@ -49,7 +49,7 @@ func TestInterruptActiveAgentInstallJobs(t *testing.T) {
 	store := sqlitetest.MustOpen(t)
 	started := time.Date(2026, 8, 31, 10, 0, 0, 0, time.UTC)
 	for _, record := range []ports.AgentInstallJobRecord{
-		{Target: "codex", Status: "installing", Method: "npm", StartedAt: started, UpdatedAt: started},
+		{Target: "opencode", Status: "installing", Method: "npm", StartedAt: started, UpdatedAt: started},
 		{Target: "opencode", Status: "verifying", Method: "homebrew", StartedAt: started, UpdatedAt: started},
 		{Target: "cursor", Status: "succeeded", Method: "manual", StartedAt: started, UpdatedAt: started},
 	} {
@@ -71,7 +71,7 @@ func TestInterruptActiveAgentInstallJobs(t *testing.T) {
 	for _, job := range jobs {
 		byTarget[job.Target] = job
 	}
-	for _, target := range []string{"codex", "opencode"} {
+	for _, target := range []string{"opencode", "opencode"} {
 		job := byTarget[target]
 		if job.Status != "interrupted" {
 			t.Errorf("%s status = %q, want interrupted", target, job.Status)

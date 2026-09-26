@@ -18,7 +18,7 @@ const CAL_URL = "https://cal.com/open-agents/design-partner";
 const MAILTO_HREF = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
   "Open Agents Design Partner Program",
 )}&body=${encodeURIComponent(
-  "Hi Prateek,\n\nWe're interested in the Open Agents design partner program.\n\nCompany:\nEngineering team size:\nAgent harnesses we use today (Codex / Cursor / OpenCode / ...):\nWhat we want out of Open Agents:\n",
+  "Hi Prateek,\n\nWe're interested in the Open Agents design partner program.\n\nCompany:\nEngineering team size:\nAgent harnesses we use today (OpenCode / Cursor / OpenCode / ...):\nWhat we want out of Open Agents:\n",
 )}`;
 const HERO_IMAGE = "/optimized/design-partners/hero-car-engine-olive.webp";
 const SHARED_WORKSPACE_IMAGE =
@@ -95,7 +95,7 @@ const phases: RoadmapPhase[] = [
     theme:
       "The single-player engine. Free, open source, already on your machine.",
     unlocks: [
-      "23 harnesses behind one board - Codex, Cursor, OpenCode, and whatever comes next",
+      "23 harnesses behind one board - OpenCode, Cursor, OpenCode, and whatever comes next",
       "Every session in its own git worktree; branches never collide",
       "CI failures and review comments route back to the agent that owns the branch",
       "A manager plans the work and spawns the workers",

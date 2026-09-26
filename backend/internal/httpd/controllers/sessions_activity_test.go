@@ -178,7 +178,7 @@ func TestSessionsAPI_ActivityForwardsMetadataOnlySessionStartToUsage(t *testing.
 	t.Cleanup(srv.Close)
 
 	body, status, _ := doRequest(t, srv, "POST", "/api/v1/sessions/open-agents-1/activity",
-		`{"event":"session-start","agentSessionId":"codex-native-1","launchId":"launch-7"}`)
+		`{"event":"session-start","agentSessionId":"opencode-native-1","launchId":"launch-7"}`)
 	if status != http.StatusOK {
 		t.Fatalf("activity = %d, want 200; body=%s", status, body)
 	}
@@ -186,7 +186,7 @@ func TestSessionsAPI_ActivityForwardsMetadataOnlySessionStartToUsage(t *testing.
 		t.Fatalf("usage calls=%d id=%q", usage.calls, usage.gotID)
 	}
 	if usage.gotSignal.Event != "session-start" ||
-		usage.gotSignal.NativeSessionID != "codex-native-1" ||
+		usage.gotSignal.NativeSessionID != "opencode-native-1" ||
 		usage.gotSignal.LaunchID != "launch-7" ||
 		usage.gotSignal.Harness != "" {
 		t.Fatalf("usage signal = %+v", usage.gotSignal)
@@ -230,7 +230,7 @@ func TestSessionsAPI_ActivityForwardsOrdinaryEventWithoutUsageMetadata(t *testin
 	t.Cleanup(srv.Close)
 
 	body, status, _ := doRequest(t, srv, "POST", "/api/v1/sessions/open-agents-1/activity",
-		`{"state":"active","event":"post-tool-use","agentSessionId":"codex-native-1","launchId":"launch-1"}`)
+		`{"state":"active","event":"post-tool-use","agentSessionId":"opencode-native-1","launchId":"launch-1"}`)
 	if status != http.StatusOK {
 		t.Fatalf("activity = %d, want 200; body=%s", status, body)
 	}
@@ -239,7 +239,7 @@ func TestSessionsAPI_ActivityForwardsOrdinaryEventWithoutUsageMetadata(t *testin
 	}
 	if usage.gotSignal.Event != "post-tool-use" ||
 		usage.gotSignal.LaunchID != "launch-1" ||
-		usage.gotSignal.NativeSessionID != "codex-native-1" ||
+		usage.gotSignal.NativeSessionID != "opencode-native-1" ||
 		usage.gotSignal.Harness != "" {
 		t.Fatalf("usage signal = %+v", usage.gotSignal)
 	}

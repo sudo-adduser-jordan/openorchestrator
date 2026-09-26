@@ -34,7 +34,7 @@ func TestProjectConfigValidate(t *testing.T) {
 		{"unsupported continue reviewer", ProjectConfig{Reviewers: []ReviewerConfig{{Harness: "continue"}}}, true},
 		{"unsupported goose reviewer", ProjectConfig{Reviewers: []ReviewerConfig{{Harness: "goose"}}}, true},
 		{"unsupported vibe reviewer", ProjectConfig{Reviewers: []ReviewerConfig{{Harness: "vibe"}}}, true},
-		{"unsupported codex reviewer", ProjectConfig{Reviewers: []ReviewerConfig{{Harness: "codex"}}}, true},
+		{"unsupported codex reviewer", ProjectConfig{Reviewers: []ReviewerConfig{{Harness: "opencode"}}}, true},
 		{"unknown reviewer harness", ProjectConfig{Reviewers: []ReviewerConfig{{Harness: "nope"}}}, true},
 		{"empty reviewer harness", ProjectConfig{Reviewers: []ReviewerConfig{{Harness: ""}}}, true},
 		{"tracker intake assignee rule", ProjectConfig{TrackerIntake: TrackerIntakeConfig{Enabled: true, Assignee: "alice"}}, false},

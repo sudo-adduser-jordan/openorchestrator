@@ -2826,12 +2826,12 @@ func TestSpawnBlocksDefinitelyMissingHarnessBeforeManager(t *testing.T) {
 	st.projects["mer"] = domain.ProjectRecord{ID: "mer"}
 	fc := &fakeCommander{}
 	readiness := &fakeAgentReadiness{snapshot: domain.AgentReadinessSnapshot{
-		ID: "codex", Installation: domain.AgentInstallationObservation{State: domain.AgentInstallationNotInstalled},
+		ID: "opencode", Installation: domain.AgentInstallationObservation{State: domain.AgentInstallationNotInstalled},
 		Authentication: domain.AgentAuthenticationObservation{State: domain.AgentAuthenticationUnknown},
 	}}
 	svc := NewWithDeps(Deps{Manager: fc, Store: st, AgentReadiness: readiness})
 
-	_, _, _, err := svc.Spawn(context.Background(), ports.SpawnConfig{ProjectID: "mer", Kind: domain.KindWorker, Harness: "codex"})
+	_, _, _, err := svc.Spawn(context.Background(), ports.SpawnConfig{ProjectID: "mer", Kind: domain.KindWorker, Harness: "opencode"})
 	var apiError *apierr.Error
 	if !errors.As(err, &apiError) || apiError.Code != "AGENT_BINARY_NOT_FOUND" {
 		t.Fatalf("Spawn error = %v, want AGENT_BINARY_NOT_FOUND", err)
@@ -2849,12 +2849,12 @@ func TestSpawnTreatsUnauthorizedReadinessAsAdvisory(t *testing.T) {
 	st.projects["mer"] = domain.ProjectRecord{ID: "mer"}
 	fc := &fakeCommander{}
 	readiness := &fakeAgentReadiness{snapshot: domain.AgentReadinessSnapshot{
-		ID: "codex", Installation: domain.AgentInstallationObservation{State: domain.AgentInstallationInstalled},
+		ID: "opencode", Installation: domain.AgentInstallationObservation{State: domain.AgentInstallationInstalled},
 		Authentication: domain.AgentAuthenticationObservation{State: domain.AgentAuthenticationUnauthorized},
 	}}
 	svc := NewWithDeps(Deps{Manager: fc, Store: st, AgentReadiness: readiness})
 
-	if _, _, _, err := svc.Spawn(context.Background(), ports.SpawnConfig{ProjectID: "mer", Kind: domain.KindWorker, Harness: "codex"}); err != nil {
+	if _, _, _, err := svc.Spawn(context.Background(), ports.SpawnConfig{ProjectID: "mer", Kind: domain.KindWorker, Harness: "opencode"}); err != nil {
 		t.Fatalf("Spawn: %v", err)
 	}
 	if fc.spawnCalls != 1 {
@@ -2878,19 +2878,19 @@ func TestSpawnInvalidatesReadinessAfterTypedLaunchFailure(t *testing.T) {
 			st.projects["mer"] = domain.ProjectRecord{ID: "mer"}
 			fc := &fakeCommander{spawnErr: tt.err}
 			readiness := &fakeAgentReadiness{snapshot: domain.AgentReadinessSnapshot{
-				ID: "codex", Installation: domain.AgentInstallationObservation{State: domain.AgentInstallationInstalled},
+				ID: "opencode", Installation: domain.AgentInstallationObservation{State: domain.AgentInstallationInstalled},
 				Authentication: domain.AgentAuthenticationObservation{State: domain.AgentAuthenticationAuthorized},
 			}}
 			svc := NewWithDeps(Deps{Manager: fc, Store: st, AgentReadiness: readiness})
 
-			_, _, _, _ = svc.Spawn(context.Background(), ports.SpawnConfig{ProjectID: "mer", Kind: domain.KindWorker, Harness: "codex"})
+			_, _, _, _ = svc.Spawn(context.Background(), ports.SpawnConfig{ProjectID: "mer", Kind: domain.KindWorker, Harness: "opencode"})
 			if got := len(readiness.installationInvalidated) == 1; got != tt.wantInstallation {
 				t.Fatalf("installation invalidated = %v, want %v", got, tt.wantInstallation)
 			}
 			if got := len(readiness.authInvalidated) == 1; got != tt.wantAuth {
 				t.Fatalf("auth invalidated = %v, want %v", got, tt.wantAuth)
 			}
-			if len(readiness.rechecks) != 1 || readiness.rechecks[0] != "codex" {
+			if len(readiness.rechecks) != 1 || readiness.rechecks[0] != "opencode" {
 				t.Fatalf("rechecks = %#v, want codex", readiness.rechecks)
 			}
 		})
@@ -3213,8 +3213,6 @@ func TestToAPIErrorMapsWorkspaceBranchSentinels(t *testing.T) {
 		{"provider history recovery unavailable", fmt.Errorf("recover interface: %w", sessionmanager.ErrInterfaceProviderHistoryRecoveryUnavailable), apierr.KindConflict, "PROVIDER_HISTORY_RECOVERY_UNAVAILABLE"},
 		{"native conversation missing", fmt.Errorf("switch interface: %w", sessionmanager.ErrNativeConversationMissing), apierr.KindConflict, "NATIVE_SESSION_MISSING"},
 		{"native conversation unverified", fmt.Errorf("switch interface: %w", sessionmanager.ErrNativeConversationUnverified), apierr.KindConflict, "NATIVE_SESSION_UNVERIFIED"},
-		{"unsupported effort", fmt.Errorf("spawn: %w", ports.ErrUnsupportedEffort), apierr.KindInvalid, "UNSUPPORTED_EFFORT"},
-		{"model capabilities unavailable", fmt.Errorf("spawn: %w", ports.ErrModelCapabilitiesUnavailable), apierr.KindInvalid, "MODEL_CAPABILITIES_UNAVAILABLE"},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -3655,14 +3653,14 @@ func TestSpawnManagerVerifiesReplacementHarness(t *testing.T) {
 			ID:        "mer-9",
 			ProjectID: "mer",
 			Kind:      domain.KindManager,
-			Harness:   "codex",
+			Harness:   "opencode",
 			Metadata:  domain.SessionMetadata{Branch: "open-agents/mer-manager"},
 		},
 	}
 	svc := &Service{manager: fc, store: st}
 
 	_, err := svc.SpawnManager(context.Background(), "mer", false, "")
-	if err == nil || !strings.Contains(err.Error(), `uses harness "codex", want "opencode"`) {
+	if err == nil || !strings.Contains(err.Error(), `uses harness "opencode", want "opencode"`) {
 		t.Fatalf("SpawnManager err = %v, want harness verification failure", err)
 	}
 }
@@ -4755,7 +4753,7 @@ func TestToSessionWithFactsRemapsTransferredAliasReviewRuns(t *testing.T) {
 	}
 	st.reviewRuns[rec.ID] = []domain.CurrentHeadReviewRun{{
 		SessionID: rec.ID,
-		Harness:   "codex",
+		Harness:   "opencode",
 		PRURL:     oldURL,
 		Status:    domain.ReviewRunRunning,
 		ID:        "run-old",
@@ -4810,11 +4808,11 @@ func TestToSessionWithFactsCanonicalAliasRunSupersedesOlderAliasRun(t *testing.T
 	}
 	st.reviewRuns[rec.ID] = []domain.CurrentHeadReviewRun{
 		{
-			SessionID: rec.ID, Harness: "codex", PRURL: oldURL,
+			SessionID: rec.ID, Harness: "opencode", PRURL: oldURL,
 			Status: domain.ReviewRunRunning, ID: "run-old", CreatedAt: rec.UpdatedAt,
 		},
 		{
-			SessionID: rec.ID, Harness: "codex", PRURL: newURL,
+			SessionID: rec.ID, Harness: "opencode", PRURL: newURL,
 			Status: domain.ReviewRunComplete, Verdict: domain.VerdictApproved,
 			ID: "run-new", CreatedAt: rec.UpdatedAt.Add(time.Minute),
 		},

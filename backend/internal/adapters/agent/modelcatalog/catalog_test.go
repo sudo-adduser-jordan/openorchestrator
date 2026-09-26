@@ -141,7 +141,7 @@ func TestBaseClassifiesStaticTextAndModeAgents(t *testing.T) {
 		mode  ports.ModelSelectionMode
 		count int
 	}{
-		{agent: "codex", mode: ports.ModelSelectionCatalog},
+		{agent: "opencode", mode: ports.ModelSelectionCatalog},
 		{agent: "amp", mode: ports.ModelSelectionModeList, count: 4},
 		{agent: "muse", mode: ports.ModelSelectionCatalog, count: 3},
 		{agent: "aider", mode: ports.ModelSelectionCatalog},
@@ -189,7 +189,6 @@ func TestCustomModelEntryPolicy(t *testing.T) {
 		wantEntryMode string
 		wantSelection ports.ModelSelectionMode
 	}{
-		{agent: "codex", wantEntryMode: "direct", wantSelection: ports.ModelSelectionCatalog},
 		{agent: "opencode", wantEntryMode: "direct", wantSelection: ports.ModelSelectionCatalog},
 		{agent: "grok", wantEntryMode: "direct", wantSelection: ports.ModelSelectionCatalog},
 		{agent: "cursor", wantEntryMode: "direct", wantSelection: ports.ModelSelectionCatalog},
@@ -270,7 +269,7 @@ zai        glm-5.2               1M       128K     yes       yes
 }
 
 func TestBaseDynamicCatalogsContainNoOpenAgentsOwnedModelIDs(t *testing.T) {
-	for _, agentID := range []string{"codex"} {
+	for _, agentID := range []string{"opencode"} {
 		t.Run(agentID, func(t *testing.T) {
 			got := Base(agentID)
 			if got.SelectionMode != ports.ModelSelectionCatalog || !got.AllowCustom || got.Source != "cli" {
@@ -280,26 +279,6 @@ func TestBaseDynamicCatalogsContainNoOpenAgentsOwnedModelIDs(t *testing.T) {
 				t.Fatalf("Base(%q) models = %#v, want no Open Agents-owned model IDs", agentID, got.Models)
 			}
 		})
-	}
-}
-
-func TestCodexDiscoveryUsesStructuredProviderCatalog(t *testing.T) {
-	discoverer := Discoverer{CodexModels: func(context.Context, ports.AgentModelDiscoveryRequest) ([]ports.ChatModel, error) {
-		return []ports.ChatModel{
-			{ID: "gpt-current", DisplayName: "GPT Current", Default: true},
-			{ID: "gpt-other", DisplayName: "GPT Other"},
-		}, nil
-	}}
-	got, err := discoverer.Discover(context.Background(), ports.AgentModelDiscoveryRequest{AgentID: "codex", Binary: "/bin/codex"})
-	if err != nil {
-		t.Fatal(err)
-	}
-	want := []ports.AgentModelInfo{
-		{ID: "gpt-current", Label: "GPT Current", IsDefault: true},
-		{ID: "gpt-other", Label: "GPT Other"},
-	}
-	if !reflect.DeepEqual(got.Models, want) || got.Source != "cli" {
-		t.Fatalf("catalog = %#v, want models %#v", got, want)
 	}
 }
 
@@ -578,10 +557,10 @@ func TestParseJSONModelsSupportsKiroAndDevinFields(t *testing.T) {
 
 func TestCatalogFingerprintKeepsTheExecutableOnlyValueForConfiglessAgents(t *testing.T) {
 	dir := t.TempDir()
-	// codex reads no configuration, so its fingerprint must stay byte-identical
+	// opencode reads no configuration, so its fingerprint must stay byte-identical
 	// to the executable fingerprint earlier daemons cached under.
-	got := CatalogFingerprint(context.Background(), "codex", "codex", dir, nil)
-	if want := BinaryVersion(context.Background(), "codex"); got != want {
+	got := CatalogFingerprint(context.Background(), "opencode", "opencode", dir, nil)
+	if want := BinaryVersion(context.Background(), "opencode"); got != want {
 		t.Fatalf("fingerprint = %q, want the executable fingerprint %q", got, want)
 	}
 }

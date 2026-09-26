@@ -2624,7 +2624,7 @@ func TestPRObservation_ReArmClearsConflictSurvivesTerminatedRestore(t *testing.T
 // urgent route consults, so an unsolicited paste never answers a hidden dialog.
 func TestPRObservation_MergeConflictReachesNeedsInputSession(t *testing.T) {
 	const safeHarness = domain.AgentHarness("opencode")
-	const ambiguousHarness = domain.AgentHarness("codex")
+	const ambiguousHarness = domain.AgentHarness("opencode")
 	urgentGate := func(h domain.AgentHarness) bool { return h == safeHarness }
 	cases := []struct {
 		name      string

@@ -1395,7 +1395,7 @@ export function useConversationSkills(sessionId: string | undefined, enabled: bo
 		queryKey: conversationSkillsQueryKey(sessionId ?? ""),
 		enabled: Boolean(sessionId) && enabled,
 		// ACP agents publish this catalog asynchronously and may replace it later.
-		// Polling also keeps Codex project skills current without introducing a
+		// Polling also keeps opencode project skills current without introducing a
 		// second renderer event channel solely for ephemeral provider metadata. The
 		// catalog can be large and changes rarely, so it intentionally refreshes much
 		// less often than conversation state.

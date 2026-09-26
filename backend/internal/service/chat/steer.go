@@ -18,7 +18,7 @@ import (
 // its reasoning, its half-applied edits, the command it has running — and the
 // resend starts from nothing. A steer adds the correction to the SAME turn and
 // leaves the work in place; the agent decides what to abandon. Measured against
-// codex-cli 0.146.0, the steered turn kept its id and settled `completed`, having
+// opencode 0.146.0, the steered turn kept its id and settled `completed`, having
 // abandoned the command it was running on its own. So the user's guidance costs
 // them nothing they had already paid for, which is the entire reason to prefer it.
 //
@@ -35,7 +35,7 @@ var (
 	// control rather than retry.
 	ErrSteerUnsupported = errors.New("chat driver cannot steer a running turn")
 	// ErrTurnNotSteerable reports a turn that is running but cannot absorb guidance.
-	// Codex refuses a compaction or review turn this way. Retryable once that turn
+	// opencode refuses a compaction or review turn this way. Retryable once that turn
 	// finishes, which is what separates it from ErrSteerUnsupported.
 	ErrTurnNotSteerable = errors.New("the running turn cannot take guidance")
 	// ErrSteerTextRequired refuses an empty steer. There is no keystroke concept in
@@ -322,7 +322,7 @@ func (c *Controller) rejectSteerBeforeDispatch(
 // Steer hands guidance to the provider for the turn currently in flight, then
 // records it on that turn.
 //
-// The wait for acknowledgement is load-bearing, not defensive. Codex refuses a
+// The wait for acknowledgement is load-bearing, not defensive. opencode refuses a
 // steer for a turn it has accepted but not yet announced — probed directly: a steer
 // sent immediately after turn/start returned, carrying the id turn/start itself had
 // just handed back, came back "no active turn to steer". Steering is most useful in
@@ -525,7 +525,7 @@ func encodeSteerDeliveryRequest(msg ports.ChatUserMessage) (string, error) {
 	encoded, err := json.Marshal(steerDeliveryRequest{
 		Text: msg.Text, Content: msg.Content, Origin: normalizeOrigin(msg.Origin),
 		Settings: deliveryRequestSettings{
-			Model: msg.Settings.Model, Effort: msg.Settings.Effort, Approval: msg.Settings.Approval,
+			Model: msg.Settings.Model, Approval: msg.Settings.Approval,
 		},
 	})
 	if err != nil {

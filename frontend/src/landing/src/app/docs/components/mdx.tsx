@@ -23,7 +23,7 @@ function Heading({ level, children }: { level: 2 | 3 | 4; children: ReactNode })
 // Brands with a real asset under /public/docs/logos/ (others fall back to a monogram).
 const FILE_LOGOS: Record<string, string> = {
   aider: "aider.png",
-  codex: "codex.svg",
+  opencode: "opencode.svg",
   cursor: "cursor.svg",
   opencode: "opencode.svg",
 };

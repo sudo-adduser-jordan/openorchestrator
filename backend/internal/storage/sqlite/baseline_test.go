@@ -201,11 +201,11 @@ func TestBaselineUsesOpenAgentsUsageMeasurementVocabulary(t *testing.T) {
 	if _, err := db.Exec(`
 INSERT INTO projects (id, path, registered_at, config) VALUES ('usage-brand', '/repo/usage-brand', ?, '{}');
 INSERT INTO sessions (id, project_id, num, harness, activity_last_at, created_at, updated_at)
-VALUES ('usage-brand-1', 'usage-brand', 1, 'codex', ?, ?, ?);
+VALUES ('usage-brand-1', 'usage-brand', 1, 'opencode', ?, ?, ?);
 INSERT INTO usage_bindings (id, session_id, harness, native_root_id, state, updated_at)
-VALUES (1, 'usage-brand-1', 'codex', 'root', 'complete', ?);
+VALUES (1, 'usage-brand-1', 'opencode', 'root', 'complete', ?);
 INSERT INTO usage_sources (id, binding_id, kind, artifact_path, state, updated_at)
-VALUES (1, 1, 'codex_rollout', '/tmp/codex.jsonl', 'complete', ?);
+VALUES (1, 1, 'kimi_wire', '/tmp/opencode.jsonl', 'complete', ?);
 INSERT INTO model_usage_events (
     binding_id, usage_source_id, provider_id, model_id, usage_measurement_kind,
     source_event_key, created_at

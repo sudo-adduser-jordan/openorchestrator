@@ -11,7 +11,7 @@ The daemon registry currently advertises 26 worker harnesses:
 
 | | | | |
 | --- | --- | --- | --- |
-| `codex` | `opencode` | `grok` | |
+| `opencode` | `grok` | | |
 | `cursor` | `qwen` | `copilot` | `kimi` |
 | `muse` | `droid` | `amp` | `agy` |
 | `crush` | `aider` | `goose` | `auggie` |
@@ -34,23 +34,21 @@ All advertised harnesses can run through their native terminal interface. Four a
 
 | Harness | Chat transport |
 | --- | --- |
-| `codex` | Codex native app-server |
 | `opencode` | Native ACP |
 | `droid` | Native ACP |
 
-Every other harness is Terminal UI-only. Choose the initial interface with `open-agents spawn --mode chat|tui`. Compatible Codex and OpenCode sessions can hand off between Chat and Terminal UI while retaining the Open Agents session and worktree.
+Every other harness is Terminal UI-only. Choose the initial interface with `open-agents spawn --mode chat|tui`. Compatible OpenCode sessions can hand off between Chat and Terminal UI while retaining the Open Agents session and worktree.
 
 ## Choosing and configuring a harness
 
 ```bash
-open-agents project set-config my-app --worker-agent codex
+open-agents project set-config my-app --worker-agent opencode
 open-agents spawn --project my-app --name auth-fix --agent opencode --mode chat
 ```
 
 `--agent` and `--harness` are aliases. Project configuration may also specify model, permission mode, environment, prompt rules, and separate worker/manager defaults. Use `open-agents project set-config --help` for the typed fields.
 
 <Cards>
-	<Card title="Codex" description="Terminal UI and native app-server Chat." href="/docs/plugins/agents/codex" />
 	<Card title="OpenCode" description="Terminal UI and native ACP Chat." href="/docs/plugins/agents/opencode" />
 	<Card title="Cursor" description="Built-in terminal harness." href="/docs/plugins/agents/cursor" />
 	<Card title="Aider" description="Built-in terminal harness." href="/docs/plugins/agents/aider" />

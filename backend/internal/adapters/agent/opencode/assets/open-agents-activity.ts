@@ -23,7 +23,7 @@ import type { Plugin } from "@opencode-ai/plugin"
 
 export const openAgentsActivity: Plugin = async ({ directory, client }) => {
   // open-agents hooks must never be able to hang opencode: cap each invocation, matching
-  // the 30s timeout the codex hook entries use.
+  // the 30s timeout the hook entries use.
   const HOOK_TIMEOUT_MS = 30_000
   // A user message is reported at most twice (see reportUserPrompt): an optional
   // early empty report, then an upgrade carrying the prompt text. Maps a message

@@ -145,9 +145,9 @@ func TestSpawnRejectsEmptySessionID(t *testing.T) {
 			w.Header().Set("Content-Type", "application/json")
 			switch {
 			case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/demo":
-				_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo","config":{"worker":{"agent":"codex"}}}}`)
+				_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo","config":{"worker":{"agent":"opencode"}}}}`)
 			case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-				_, _ = io.WriteString(w, authorizedAgentsJSON("codex"))
+				_, _ = io.WriteString(w, authorizedAgentsJSON("opencode"))
 			case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 				_, _ = io.WriteString(w, body)
 			default:
@@ -158,7 +158,7 @@ func TestSpawnRejectsEmptySessionID(t *testing.T) {
 		writeRunFileFor(t, cfg, srv)
 
 		out, _, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }},
-			"spawn", "--project", "demo", "--agent", "codex", "--name", "worker")
+			"spawn", "--project", "demo", "--agent", "opencode", "--name", "worker")
 		if err == nil {
 			t.Fatalf("body %q: expected spawn error, got success %q", body, out)
 		}

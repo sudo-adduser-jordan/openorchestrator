@@ -57,7 +57,7 @@ Workers implement tasks and own code changes. Managers supervise a project and c
 ```json
 {
   "worker": {
-    "agent": "codex",
+    "agent": "opencode",
     "agentConfig": { "model": "gpt-5.4", "permissions": "bypass-permissions" }
   },
   "manager": {
@@ -73,9 +73,9 @@ The exact model names come from the installed provider. Open Agents reuses the p
 
 The role selects what a session does; the interface selects how you interact with its agent.
 
-- Chat is available when the installed harness advertises native Chat support. Current drivers cover Codex, OpenCode, and Droid.
+- Chat is available when the installed harness advertises native Chat support. Current drivers cover OpenCode, OpenCode, and Droid.
 - Terminal UI remains available across the wider agent adapter catalog.
-- Compatible Codex and OpenCode sessions can hand off between Chat and Terminal UI while keeping their Open Agents session and worktree.
+- Compatible OpenCode and OpenCode sessions can hand off between Chat and Terminal UI while keeping their Open Agents session and worktree.
 
 Choose the default interface in desktop project settings. Override it for a single CLI spawn with `--mode chat` or `--mode tui`.
 
@@ -87,7 +87,7 @@ Use `agentRules` or `agentRulesFile` for worker instructions and `managerRules` 
 
 ## Reviewer agents
 
-Reviewer harnesses are configured separately from workers. Open Agents currently supports Codex and OpenCode reviewers. If none is configured, Open Agents reuses the worker harness when it is review-capable, otherwise it falls back to Codex.
+Reviewer harnesses are configured separately from workers. Open Agents currently supports OpenCode and OpenCode reviewers. If none is configured, Open Agents reuses the worker harness when it is review-capable, otherwise it falls back to OpenCode.
 
 Review runs are available in the desktop inspector and through:
 
@@ -102,7 +102,7 @@ For a complete replacement, pass the project config as a JSON object string:
 
 ```bash
 open-agents project set-config <project-id> \
-  --config-json '{"worker":{"agent":"codex"}}'
+  --config-json '{"worker":{"agent":"opencode"}}'
 ```
 
 Run `open-agents project set-config --help` for focused flags and `--clear`. Because replacement is atomic, inspect the existing project first when scripting updates.
@@ -189,7 +189,7 @@ manager:
     model: gpt-5
 
 worker:
-  agent: codex
+  agent: opencode
   agentConfig:
     model: gpt-5.4
     permissions: permissionless
@@ -206,7 +206,7 @@ reviewers:
   - harness: kilocode
 ```
 
-Built-in reviewer harnesses are `aider`, `agy`, `amp`, `auggie`, `autohand`, `cline`, `codex`, `copilot`, `crush`, `cursor`, `devin`, `droid`, `grok`, `kilocode`, `kimchi`, `kiro`, `kimi`, `opencode`, and `pi`. Kilo Code requires the
+Built-in reviewer harnesses are `aider`, `agy`, `amp`, `auggie`, `autohand`, `cline`, `opencode`, `copilot`, `crush`, `cursor`, `devin`, `droid`, `grok`, `kilocode`, `kimchi`, `kiro`, `kimi`, `opencode`, and `pi`. Kilo Code requires the
 [`@kilocode/cli`](https://kilo.ai/docs/code-with-ai/platforms/cli) package and a configured model provider (`/connect`,
 `kilo auth login`, or a supported provider environment variable). Open Agents launches Kilo Code in the worker checkout with a
 read-only review policy and its own GitHub/Open Agents reporting instructions. It does not invoke Kilo's local `/review` command

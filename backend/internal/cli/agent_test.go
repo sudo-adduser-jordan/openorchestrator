@@ -17,7 +17,7 @@ func TestAgentListEnsuresDisplayReadinessByDefault(t *testing.T) {
 		appendPrimaryRequest(&requests, r)
 		w.Header().Set("Content-Type", "application/json")
 		if r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure" {
-			_, _ = io.WriteString(w, readinessAgentsJSON("codex", "not_installed", "unknown"))
+			_, _ = io.WriteString(w, readinessAgentsJSON("opencode", "not_installed", "unknown"))
 			return
 		}
 		http.NotFound(w, r)
@@ -29,7 +29,7 @@ func TestAgentListEnsuresDisplayReadinessByDefault(t *testing.T) {
 	if err != nil {
 		t.Fatalf("agent ls failed: %v stderr=%s", err, errOut)
 	}
-	if !strings.Contains(out, "codex") || !strings.Contains(out, "needs install") {
+	if !strings.Contains(out, "opencode") || !strings.Contains(out, "needs install") {
 		t.Fatalf("output missing table labels:\n%s", out)
 	}
 	want := []string{"POST /api/v1/agents/readiness/ensure"}
@@ -47,14 +47,14 @@ func TestAgentListRefreshAndStatuses(t *testing.T) {
 		if r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/refresh" {
 			_, _ = io.WriteString(w, `{"supported":[`+
 				`{"id":"aider","label":"Aider","authStatus":"unauthorized"},`+
-				`{"id":"codex","label":"Codex","authStatus":"authorized"},`+
+				`{"id":"opencode","label":"OpenCode","authStatus":"authorized"},`+
 				`{"id":"goose","label":"Goose","authStatus":"unknown"},`+
 				`{"id":"opencode","label":"OpenCode","authStatus":"unknown"}],`+
 				`"installed":[`+
 				`{"id":"aider","label":"Aider","authStatus":"unauthorized"},`+
-				`{"id":"codex","label":"Codex","authStatus":"authorized"},`+
+				`{"id":"opencode","label":"OpenCode","authStatus":"authorized"},`+
 				`{"id":"goose","label":"Goose","authStatus":"unknown"}],`+
-				`"authorized":[{"id":"codex","label":"Codex","authStatus":"authorized"}]}`)
+				`"authorized":[{"id":"opencode","label":"OpenCode","authStatus":"authorized"}]}`)
 			return
 		}
 		http.NotFound(w, r)
@@ -66,7 +66,7 @@ func TestAgentListRefreshAndStatuses(t *testing.T) {
 	if err != nil {
 		t.Fatalf("agent ls --refresh failed: %v stderr=%s", err, errOut)
 	}
-	for _, want := range []string{"codex", "authorized", "aider", "needs auth", "goose", "auth unknown", "opencode", "needs install"} {
+	for _, want := range []string{"opencode", "authorized", "aider", "needs auth", "goose", "auth unknown", "opencode", "needs install"} {
 		if !strings.Contains(out, want) {
 			t.Fatalf("output missing %q:\n%s", want, out)
 		}
@@ -82,7 +82,7 @@ func TestAgentListJSONEmitsRawCatalog(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		if r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure" {
-			_, _ = io.WriteString(w, authorizedAgentsJSON("codex"))
+			_, _ = io.WriteString(w, authorizedAgentsJSON("opencode"))
 			return
 		}
 		http.NotFound(w, r)

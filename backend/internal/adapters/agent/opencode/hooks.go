@@ -63,7 +63,7 @@ const (
 // inside the binary and is written verbatim into a session's worktree on hook
 // install. It is a real, lintable source file under assets/ rather than a Go
 // string literal because it is opencode plugin source code, not a data
-// structure Open Agents assembles (the way it builds Codex hook JSON).
+// structure Open Agents assembles.
 //
 //go:embed assets/open-agents-activity.ts
 var opencodePluginSource string

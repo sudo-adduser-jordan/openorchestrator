@@ -206,7 +206,7 @@ func (s *Service) checkHarness(ctx context.Context) Requirement {
 	if len(inv.Installed) == 0 {
 		return Requirement{
 			ID: "harness", Label: label, Required: true,
-			Detail: "No agent CLI (Codex, etc.) was found on PATH.",
+			Detail: "No agent CLI (opencode, etc.) was found on PATH.",
 		}
 	}
 	labels := make([]string, 0, len(inv.Installed))
@@ -225,7 +225,7 @@ func (s *Service) checkStartupHarness(ctx context.Context) Requirement {
 	if !ok {
 		return Requirement{
 			ID: "harness", Label: label, Required: true,
-			Detail: "No agent CLI (Codex, etc.) was found on PATH or in a supported install location.",
+			Detail: "No agent CLI (opencode, etc.) was found on PATH or in a supported install location.",
 		}
 	}
 	return Requirement{ID: "harness", Label: label, Satisfied: true, Required: true, Detail: info.Label}

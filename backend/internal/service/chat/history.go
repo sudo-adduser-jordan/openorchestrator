@@ -350,7 +350,7 @@ func (s *Service) EditMessage(
 			defer cancel()
 			operationCtx = detachedCtx
 			sourceStopInitiated = true
-			// Codex loads a fork into the source app-server, which remains that
+			// opencode loads a fork into the source app-server, which remains that
 			// child's active writer until the process exits. Close the fenced, idle
 			// source before another driver process resumes the child.
 			if closeErr := source.closeForBranchHandoff(operationCtx); closeErr != nil {
@@ -363,7 +363,7 @@ func (s *Service) EditMessage(
 					provider, err = driver.Resume(operationCtx, ports.ChatResumeConfig{
 						SessionID: cfg.SessionID, ProviderConversationID: providerConversationID,
 						DataDir: cfg.DataDir, WorkspacePath: cfg.WorkspacePath, Env: launchEnv,
-						Model: cfg.Model, Effort: cfg.Effort,
+						Model: cfg.Model,
 						Permissions: cfg.Permissions, SystemPrompt: cfg.SystemPrompt,
 						ProviderScopeID:       sourceBranch.ProviderScopeID,
 						ProviderIDsScoped:     sourceBranch.ProviderIDsScoped,
@@ -402,7 +402,7 @@ func (s *Service) EditMessage(
 			} else {
 				provider, err = driver.Start(operationCtx, ports.ChatStartConfig{
 					SessionID: cfg.SessionID, DataDir: cfg.DataDir, WorkspacePath: cfg.WorkspacePath,
-					Env: launchEnv, Model: cfg.Model, Effort: cfg.Effort,
+					Env: launchEnv, Model: cfg.Model,
 					Permissions:  cfg.Permissions,
 					SystemPrompt: cfg.SystemPrompt, AdditionalDirectories: cfg.AdditionalDirectories,
 					MCPServers: cfg.MCPServers, ProviderScopeID: providerScopeID, ProviderIDsScoped: true,
@@ -718,7 +718,7 @@ func encodeEditDeliveryRequest(turnID string, msg ports.ChatUserMessage) (string
 		SourceTurnID: turnID, Text: msg.Text, Content: msg.Content,
 		Origin: normalizeOrigin(msg.Origin),
 		Settings: deliveryRequestSettings{
-			Model: msg.Settings.Model, Effort: msg.Settings.Effort, Approval: msg.Settings.Approval,
+			Model: msg.Settings.Model, Approval: msg.Settings.Approval,
 		},
 	})
 	if err != nil {
@@ -944,7 +944,7 @@ func (s *Service) activateBranchLocked(ctx context.Context, id domain.SessionID,
 	provider, err := driver.Resume(operationCtx, ports.ChatResumeConfig{
 		SessionID: cfg.SessionID, ProviderConversationID: branch.ProviderConversationID,
 		DataDir: cfg.DataDir, WorkspacePath: cfg.WorkspacePath, Env: launchEnv,
-		Model: cfg.Model, Effort: cfg.Effort,
+		Model: cfg.Model,
 		Permissions: cfg.Permissions, SystemPrompt: cfg.SystemPrompt,
 		ProviderScopeID:       branch.ProviderScopeID,
 		ProviderIDsScoped:     branch.ProviderIDsScoped,
@@ -1044,7 +1044,7 @@ func (s *Service) restoreClosedSourceController(
 	provider, err := driver.Resume(recoveryCtx, ports.ChatResumeConfig{
 		SessionID: cfg.SessionID, ProviderConversationID: providerConversationID,
 		DataDir: cfg.DataDir, WorkspacePath: cfg.WorkspacePath, Env: launchEnv,
-		Model: cfg.Model, Effort: cfg.Effort,
+		Model: cfg.Model,
 		Permissions: cfg.Permissions, SystemPrompt: cfg.SystemPrompt,
 		ProviderScopeID:       branch.ProviderScopeID,
 		ProviderIDsScoped:     branch.ProviderIDsScoped,
@@ -1214,6 +1214,5 @@ func truncateAtWord(title string, limit int) string {
 // an idempotency conflict after an app upgrade.
 type deliveryRequestSettings struct {
 	Model    string               `json:"model,omitempty"`
-	Effort   string               `json:"effort,omitempty"`
 	Approval ports.PermissionMode `json:"approval,omitempty"`
 }

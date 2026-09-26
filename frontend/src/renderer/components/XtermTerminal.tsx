@@ -570,7 +570,7 @@ export function XtermTerminal(props: XtermTerminalProps) {
 				// Alt-buffer panes (tmux attach, mouse-tracking agent TUIs) never feed
 				// this buffer — the alt screen doesn't accumulate scrollback — so this
 				// only matters for normal-buffer panes that print their transcript and
-				// rely on the terminal's scrollback (codex, a plain shell). Keep it > 0
+				// rely on the terminal's scrollback (opencode, a plain shell). Keep it > 0
 				// so that history survives to be scrolled locally (see the wheel
 				// handler's normal-buffer branch). macOS exposes that history through a
 				// slim draggable scrollbar; other platforms retain the existing hidden
@@ -880,7 +880,7 @@ export function XtermTerminal(props: XtermTerminalProps) {
 				setSearchOpen(true);
 				return false;
 			}
-			// Shift+Enter → newline without submitting, matching Codex.
+			// Shift+Enter → newline without submitting, matching opencode.
 			// A terminal normally sends the same CR for Enter and Shift+Enter, so the
 			// agent can't distinguish them; emit the meta-return (ESC+CR) that
 			// readline/Ink-based TUIs interpret as "insert a newline" rather than
@@ -1100,7 +1100,7 @@ export function XtermTerminal(props: XtermTerminalProps) {
 
 		// Do not replace this with term.onData. xterm's raw data stream can include
 		// terminal-generated control responses during attach/repaint; forwarding
-		// those bytes through the mux writes dirty input into the real Codex PTY and
+		// those bytes through the mux writes dirty input into the real opencode PTY and
 		// corrupts the TUI. Keyboard is the only safe generic text path here; paste,
 		// composition, shortcuts, and wheel reports are emitted explicitly below.
 		// Forward validated OSC 4/10/11/12 color replies and cursor-position
@@ -1154,7 +1154,7 @@ export function XtermTerminal(props: XtermTerminalProps) {
 				emitUserInput(pageKeyReport(lines), "wheel");
 				return false;
 			}
-			// A normal-buffer pane with mouse tracking off (codex, a plain shell)
+			// A normal-buffer pane with mouse tracking off (opencode, a plain shell)
 			// prints its transcript and relies on the terminal's own scrollback — the
 			// way it scrolls in a raw terminal. Scroll xterm's viewport locally; the
 			// pane never sees these bytes. Requires scrollback > 0 (see Terminal opts).
@@ -1192,7 +1192,7 @@ export function XtermTerminal(props: XtermTerminalProps) {
 		shell.addEventListener("compositionend", compositionInput, true);
 
 		// A file dropped on the pane inserts its path, mirroring a native terminal
-		// so an agent (e.g. Codex) attaches it. The sandboxed renderer cannot
+		// so an agent (e.g. opencode) attaches it. The sandboxed renderer cannot
 		// read a dropped file's original path on macOS, so the bytes are stashed to
 		// a temp file by the main process and that path is inserted instead.
 		const isFileDrag = (event: DragEvent) => Array.from(event.dataTransfer?.types ?? []).includes("Files");

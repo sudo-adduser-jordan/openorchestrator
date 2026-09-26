@@ -26,10 +26,6 @@ func TestDelegateTaskSpawnsWorkerThenRequestsTitleFromNewestActiveManager(t *tes
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			var effort *string
-			if tt.effort != "" {
-				effort = &tt.effort
-			}
 			st := newFakeStore()
 			st.projects["open-agents"] = domain.ProjectRecord{ID: "open-agents"}
 			now := time.Now().UTC()
@@ -43,7 +39,7 @@ func TestDelegateTaskSpawnsWorkerThenRequestsTitleFromNewestActiveManager(t *tes
 
 			brief := "  Fix the renderer\nwithout changing the API.  "
 			out, err := svc.DelegateTask(context.Background(), DelegateTaskInput{
-				ProjectID: "open-agents", Brief: brief, RequestedAgent: tt.agent, Model: tt.model, Effort: effort, RequestedMode: tt.mode,
+				ProjectID: "open-agents", Brief: brief, RequestedAgent: tt.agent, Model: tt.model, RequestedMode: tt.mode,
 			})
 			if err != nil {
 				t.Fatalf("DelegateTask: %v", err)
@@ -57,12 +53,7 @@ func TestDelegateTaskSpawnsWorkerThenRequestsTitleFromNewestActiveManager(t *tes
 			if cmd.spawnedCfg.AgentConfig.Model != strings.TrimSpace(tt.model) {
 				t.Fatalf("spawn model = %q, want %q", cmd.spawnedCfg.AgentConfig.Model, strings.TrimSpace(tt.model))
 			}
-			if cmd.spawnedCfg.AgentConfig.Effort != strings.TrimSpace(tt.effort) {
-				t.Fatalf("spawn tuning = %#v", cmd.spawnedCfg.AgentConfig)
-			}
-			if cmd.spawnedCfg.EffortOverride != (effort != nil) {
-				t.Fatalf("spawn tuning presence = %#v", cmd.spawnedCfg)
-			}
+
 			if cmd.spawnedCfg.RequestedMode != tt.mode {
 				t.Fatalf("spawn mode = %q, want %q", cmd.spawnedCfg.RequestedMode, tt.mode)
 			}

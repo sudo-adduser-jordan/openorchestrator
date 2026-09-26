@@ -46,8 +46,8 @@ test("generates Markdown with every tab panel and without tab controls", async (
         <section data-doc-tab-panel data-doc-tab-label="OpenCode">
           <p>Run OpenCode.</p>
         </section>
-        <section data-doc-tab-panel data-doc-tab-label="Codex" hidden>
-          <p>Run Codex.</p>
+        <section data-doc-tab-panel data-doc-tab-label="OpenCode" hidden>
+          <p>Run OpenCode.</p>
         </section>
       </article>
     `,

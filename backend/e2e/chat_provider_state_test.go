@@ -32,7 +32,7 @@ func TestChatE2EProviderStateFromOneTurn(t *testing.T) {
 	session := spawn(t, d, map[string]any{
 		"projectId": projectID,
 		"kind":      "worker",
-		"harness":   "codex",
+		"harness":   "opencode",
 		"mode":      "chat",
 	}).Session.ID
 
@@ -209,7 +209,7 @@ func TestChatE2EReloadMCPServers(t *testing.T) {
 	session := spawn(t, d, map[string]any{
 		"projectId": projectID,
 		"kind":      "worker",
-		"harness":   "codex",
+		"harness":   "opencode",
 		"mode":      "chat",
 	}).Session.ID
 	d.awaitLiveController(session, 90*time.Second)

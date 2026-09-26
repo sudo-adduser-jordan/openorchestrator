@@ -12,9 +12,9 @@ const POLL_MS = 100;
 
 const harnesses = [
 	{
-		id: "codex",
-		label: "Codex",
-		icon: "/app-icons/coverage-codex.svg",
+		id: "opencode",
+		label: "OpenCode",
+		icon: "/app-icons/coverage-opencode.svg",
 		status: "Authorized",
 	},
 	{

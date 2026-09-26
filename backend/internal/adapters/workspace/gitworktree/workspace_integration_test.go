@@ -213,7 +213,7 @@ func TestWorkspaceIntegrationDestroyDirtyWorktree(t *testing.T) {
 
 	// Open Agents-managed hook files behind a self-ignoring .gitignore: invisible to git
 	// status, so they must not block teardown.
-	hookDir := filepath.Join(info.Path, ".codex")
+	hookDir := filepath.Join(info.Path, ".opencode")
 	if err := os.MkdirAll(hookDir, 0o750); err != nil {
 		t.Fatalf("mkdir hook dir: %v", err)
 	}

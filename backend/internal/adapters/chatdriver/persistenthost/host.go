@@ -270,7 +270,7 @@ func validateDescriptor(cfg Config, d Descriptor) error {
 	if d.Protocol != cfg.Protocol {
 		return fmt.Errorf("%w: host protocol=%q requested=%q", ErrIncompatible, d.Protocol, cfg.Protocol)
 	}
-	// Codex raw hosts predate this ACP compatibility contract and retain their
+	// Raw protocol hosts predate this ACP compatibility contract and retain their
 	// existing version/protocol fencing.
 	if d.Protocol == ProtocolRaw {
 		return nil

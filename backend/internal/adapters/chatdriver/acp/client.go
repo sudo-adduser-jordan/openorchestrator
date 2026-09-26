@@ -762,7 +762,7 @@ func (c *conversation) toolEvent(turnID string, tool *toolState, completed bool)
 			// The neutral command-detail contract (`detail.command`) is what the
 			// chat timeline renders as the row's subject. rawInput is a
 			// provider-shaped object (a Bash tool call carries {"command": "..."});
-			// the codex driver sets this key directly, and ACP-backed harnesses must
+			// the opencode driver sets this key directly, and ACP-backed harnesses must
 			// too or the UI can only ever say "Ran command".
 			detailMap["command"] = commanddetail.UnwrapShell(rawCommand)
 			// Keep the exact provider value beside the display form. The timeline is

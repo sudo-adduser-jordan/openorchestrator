@@ -466,8 +466,6 @@ type ConversationPlanStep struct {
 type ConversationSettings struct {
 	// Model is the provider's model id. Empty means the provider's default.
 	Model string `json:"model,omitempty"`
-	// ReasoningEffort is how much thinking to spend, from the model's own list.
-	ReasoningEffort string `json:"reasoningEffort,omitempty"`
 	// ApprovalMode is Open Agents's permission vocabulary, applied per turn.
 	ApprovalMode PermissionMode `json:"approvalMode,omitempty"`
 	// OpenCodeMode is the provider-owned mode explicitly selected through ACP.

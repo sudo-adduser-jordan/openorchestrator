@@ -1476,7 +1476,7 @@ func (q *Queries) ReserveQueuedConversationTurnForPromotion(ctx context.Context,
 
 const resetConversationAgentOverridesForSession = `-- name: ResetConversationAgentOverridesForSession :exec
 UPDATE conversations
-SET model = NULL, reasoning_effort = NULL, updated_at = ?
+SET model = NULL, updated_at = ?
 WHERE current_session_id = ?
 `
 
@@ -3811,17 +3811,16 @@ func (q *Queries) UpdateConversationTurnPlan(ctx context.Context, arg UpdateConv
 
 const updateConversationTurnSettings = `-- name: UpdateConversationTurnSettings :exec
 UPDATE conversations
-SET model = ?, reasoning_effort = ?, approval_mode = ?, opencode_mode = ?, updated_at = ?
+SET model = ?, approval_mode = ?, opencode_mode = ?, updated_at = ?
 WHERE id = ?
 `
 
 type UpdateConversationTurnSettingsParams struct {
-	Model           sql.NullString
-	ReasoningEffort sql.NullString
-	ApprovalMode    sql.NullString
-	OpencodeMode    string
-	UpdatedAt       time.Time
-	ID              string
+	Model        sql.NullString
+	ApprovalMode sql.NullString
+	OpencodeMode string
+	UpdatedAt    time.Time
+	ID           string
 }
 
 // The next turn's provider choices. Written only when the user picks something,
@@ -3831,7 +3830,6 @@ type UpdateConversationTurnSettingsParams struct {
 func (q *Queries) UpdateConversationTurnSettings(ctx context.Context, arg UpdateConversationTurnSettingsParams) error {
 	_, err := q.db.ExecContext(ctx, updateConversationTurnSettings,
 		arg.Model,
-		arg.ReasoningEffort,
 		arg.ApprovalMode,
 		arg.OpencodeMode,
 		arg.UpdatedAt,

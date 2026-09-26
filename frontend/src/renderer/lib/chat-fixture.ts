@@ -2,7 +2,7 @@
  * A conversation fixture for developing the Chat surface before the daemon can
  * serve one.
  *
- * The shapes are taken from a real `codex app-server` session (codex-cli
+ * The shapes are taken from a real `opencode app-server` session (opencode
  * 0.146.0), not invented — including the details that are easy to get wrong:
  *
  *  - the approval offers `accept`, an object-shaped `acceptWithExecpolicyAmendment`,
@@ -87,7 +87,7 @@ export const chatFixture: ConversationSnapshot = {
 			diff: {
 				files: [
 					{ path: "backend/internal/ports/chat.go", additions: 34, deletions: 2, status: "modified" },
-					{ path: "backend/internal/adapters/chatdriver/codexappserver/diff.go", additions: 128, deletions: 0, status: "added" },
+					{ path: "backend/internal/adapters/chatdriver/opencodeappserver/diff.go", additions: 128, deletions: 0, status: "added" },
 					{ path: "backend/internal/chat/legacy_shim.go", additions: 0, deletions: 61, status: "deleted" },
 					{ path: "backend/internal/chat/normalize.go", oldPath: "backend/internal/chat/translate.go", additions: 4, deletions: 4, status: "renamed" },
 				],
@@ -147,7 +147,7 @@ export const chatFixture: ConversationSnapshot = {
 			status: "completed",
 			summary: "Reasoning",
 			// A settled summary in the shape the provider really sends: markdown with a
-			// bolded section header. It only arrives at all when the user's own codex
+			// bolded section header. It only arrives at all when the user's own opencode
 			// config asks for summaries — `chatFixtureReasoningEmpty` is the default
 			// install, which is the case the UI has to explain rather than show.
 			detail: {
@@ -332,7 +332,7 @@ export const chatFixture: ConversationSnapshot = {
 				//
 				// Carrying its escape sequences, because that is how output arrives:
 				// nothing in the stack strips them. `go test` colours its verdicts, the
-				// codex PTY inserts `\x1b[@` runs, and a progress line redraws itself with
+				// opencode PTY inserts `\x1b[@` runs, and a progress line redraws itself with
 				// carriage returns. Rendered verbatim this row is unreadable, which is what
 				// `lib/ansi.ts` exists to fix. The bare `[@` is deliberate: the widely
 				// copied ansi-regex omits `@` from its CSI final-byte class.
@@ -627,12 +627,12 @@ const SUBJECTS = ["conversation", "session_manager", "httpd", "ports"];
 /* -------------------------------------------------------------------------- */
 
 /**
- * A default Codex install: reasoning items arrive, and every one of them is empty.
+ * A default opencode install: reasoning items arrive, and every one of them is empty.
  *
  * This is the case the reasoning toggle has to survive. The provider emits a
  * reasoning item per tool call whether or not summaries are configured, and writes a
- * body only when the user's own `~/.codex/config.toml` asks for one — measured on
- * codex-cli 0.146.0 as six empty items by default against ten items with nine bodies
+ * body only when the user's own `~/.opencode/config.toml` asks for one — measured on
+ * opencode 0.146.0 as six empty items by default against ten items with nine bodies
  * once the setting was on. Open Agents does not rewrite that file, so the UI has to explain
  * the emptiness rather than look broken.
  */

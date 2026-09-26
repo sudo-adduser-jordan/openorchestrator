@@ -26,7 +26,7 @@ open-agents spawn [flags]
 
 `--agent` is an alias for `--harness`.
 
-Available harnesses: `codex`, `aider`, `opencode`, `grok`, `droid`, `amp`, `agy`, `crush`, `cursor`, `qwen`, `copilot`, `goose`, `auggie`, `continue`, `devin`, `cline`, `kimi`, `kiro`, `kilocode`, `vibe`, `pi`, `autohand`.
+Available harnesses: `opencode`, `aider`, `opencode`, `grok`, `droid`, `amp`, `agy`, `crush`, `cursor`, `qwen`, `copilot`, `goose`, `auggie`, `continue`, `devin`, `cline`, `kimi`, `kiro`, `kilocode`, `vibe`, `pi`, `autohand`.
 
 ## Examples
 
@@ -44,5 +44,5 @@ open-agents spawn --project open-agents --issue 142 --name "fix-session-leak" --
 
 ```bash
 # Spawn a worker and immediately claim an open PR
-open-agents spawn --project open-agents --name "review-pr-88" --claim-pr 88 --harness codex
+open-agents spawn --project open-agents --name "review-pr-88" --claim-pr 88 --harness opencode
 ```

@@ -120,7 +120,7 @@ func Manual(agentID string) ports.AgentModelCatalog {
 // availability remain agent-owned and are never listed here.
 func customModelEntryMode(agentID string) ports.CustomModelEntryMode {
 	switch agentID {
-	case "codex", "opencode", "grok", "cursor", "qwen",
+	case "opencode", "grok", "cursor", "qwen",
 		"kimi", "muse", "aider", "goose", "autohand":
 		return ports.CustomModelEntryDirect
 	case "continue", "cline", "kilocode", "vibe", "pi", "kimchi", "prime-agent":
@@ -132,13 +132,8 @@ func customModelEntryMode(agentID string) ports.CustomModelEntryMode {
 
 // Discoverer implements the model-discovery port for production daemon wiring.
 type Discoverer struct {
-	CodexModels  CodexModelListFunc
 	ClineOptions ClineConfigOptionListFunc
 }
-
-// CodexModelListFunc obtains Codex's account-scoped app-server catalog without
-// opening a provider thread.
-type CodexModelListFunc func(context.Context, ports.AgentModelDiscoveryRequest) ([]ports.ChatModel, error)
 
 // ClineConfigOptionListFunc obtains Cline's provider-owned model choices from
 // the ACP configuration catalog advertised by session/new.
@@ -148,9 +143,6 @@ type ClineConfigOptionListFunc func(context.Context, ports.AgentModelDiscoveryRe
 func (d Discoverer) Discover(ctx context.Context, request ports.AgentModelDiscoveryRequest) (ports.AgentModelCatalog, error) {
 	if request.AgentID == "muse" {
 		return Base(request.AgentID), nil
-	}
-	if request.AgentID == "codex" {
-		return discoverCodexCatalog(ctx, request, d.CodexModels)
 	}
 	if request.AgentID == "cline" && d.ClineOptions != nil {
 		if catalog, err := discoverClineCatalog(ctx, request, d.ClineOptions); err == nil {
@@ -179,9 +171,6 @@ func Discover(ctx context.Context, agentID, binary, workingDir string, env map[s
 	if agentID == "muse" {
 		return base, nil
 	}
-	if agentID == "codex" {
-		return base, errors.New("codex model discovery requires app-server")
-	}
 	if hasConfigDiscoverySource(agentID) {
 		return discoverConfigCatalog(agentID, workingDir, env)
 	}
@@ -208,43 +197,6 @@ func Discover(ctx context.Context, agentID, binary, workingDir string, env map[s
 		return base, fmt.Errorf("%s model discovery returned no models", agentID)
 	}
 	base.Models = models
-	base.Source = "cli"
-	base.FetchedAt = time.Now().UTC()
-	return base, nil
-}
-
-func discoverCodexCatalog(ctx context.Context, request ports.AgentModelDiscoveryRequest, list CodexModelListFunc) (ports.AgentModelCatalog, error) {
-	base := Base(request.AgentID)
-	if list == nil {
-		return base, errors.New("codex app-server model discovery is unavailable")
-	}
-	models, err := list(ctx, request)
-	if err != nil {
-		return base, fmt.Errorf("codex model discovery: %w", err)
-	}
-	normalized := make([]ports.AgentModelInfo, 0, len(models))
-	for _, item := range models {
-		id := strings.TrimSpace(item.ID)
-		if id == "" {
-			continue
-		}
-		label := strings.TrimSpace(item.DisplayName)
-		if label == "" {
-			label = id
-		}
-		provider := ""
-		if prefix, _, ok := strings.Cut(id, "/"); ok {
-			provider = prefix
-		}
-		normalized = append(normalized, ports.AgentModelInfo{
-			ID: id, Label: label, Provider: provider, IsDefault: item.Default,
-			Efforts: append([]string(nil), item.Efforts...), DefaultEffort: item.DefaultEffort,
-		})
-	}
-	if len(normalized) == 0 {
-		return base, errors.New("codex model discovery returned no models")
-	}
-	base.Models = normalize(normalized)
 	base.Source = "cli"
 	base.FetchedAt = time.Now().UTC()
 	return base, nil
@@ -298,10 +250,6 @@ func discoverClineCatalog(
 }
 
 func hasDiscoverySource(agentID string) bool {
-	switch agentID {
-	case "codex":
-		return true
-	}
 	if hasConfigDiscoverySource(agentID) {
 		return true
 	}

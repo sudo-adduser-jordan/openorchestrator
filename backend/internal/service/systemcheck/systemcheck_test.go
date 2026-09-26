@@ -74,7 +74,7 @@ func lookPathFound(paths map[string]string) func(string) (string, error) {
 
 func TestCheck_AllSatisfied(t *testing.T) {
 	catalog := &fakeHarnessCatalog{inventory: agentsvc.Inventory{
-		Installed: []agentsvc.Info{{ID: "codex", Label: "Codex"}},
+		Installed: []agentsvc.Info{{ID: "opencode", Label: "OpenCode"}},
 	}}
 	svc := NewWithCommandRunner(catalog, executableFinderFunc(lookPathFound(map[string]string{
 		"git":  "/usr/bin/git",
@@ -110,7 +110,7 @@ func TestCheck_AllSatisfied(t *testing.T) {
 func TestCheckStartup_SkipsAgentInventory(t *testing.T) {
 	catalog := &fakeHarnessCatalog{
 		err:      errors.New("agent auth probe must not run at startup"),
-		binary:   agentsvc.Info{ID: "codex", Label: "Codex"},
+		binary:   agentsvc.Info{ID: "opencode", Label: "OpenCode"},
 		binaryOK: true,
 	}
 	runner := &fakeCommandRunner{err: errors.New("credential probe must not run at startup")}
@@ -166,7 +166,7 @@ func TestCheckStartup_NoAgentBinaryBlocksReady(t *testing.T) {
 
 func TestCheck_GitMissing(t *testing.T) {
 	catalog := &fakeHarnessCatalog{inventory: agentsvc.Inventory{
-		Installed: []agentsvc.Info{{ID: "codex", Label: "Codex"}},
+		Installed: []agentsvc.Info{{ID: "opencode", Label: "OpenCode"}},
 	}}
 	svc := NewWithLookPath(catalog, lookPathFound(map[string]string{
 		"tmux": "/usr/bin/tmux",
@@ -193,7 +193,7 @@ func TestCheck_GitMissing(t *testing.T) {
 
 func TestCheck_TmuxMissing(t *testing.T) {
 	catalog := &fakeHarnessCatalog{inventory: agentsvc.Inventory{
-		Installed: []agentsvc.Info{{ID: "codex", Label: "Codex"}},
+		Installed: []agentsvc.Info{{ID: "opencode", Label: "OpenCode"}},
 	}}
 	svc := NewWithLookPath(catalog, lookPathFound(map[string]string{
 		"git": "/usr/bin/git",
@@ -222,7 +222,7 @@ func TestCheck_UsesBundledTmuxOverride(t *testing.T) {
 	const bundled = "/opt/open-agents/resources/tmux/bin/tmux"
 	t.Setenv("OPEN_AGENTS_TMUX_BINARY", bundled)
 	catalog := &fakeHarnessCatalog{inventory: agentsvc.Inventory{
-		Installed: []agentsvc.Info{{ID: "codex", Label: "Codex"}},
+		Installed: []agentsvc.Info{{ID: "opencode", Label: "OpenCode"}},
 	}}
 	var requested string
 	svc := NewWithLookPath(catalog, func(name string) (string, error) {
@@ -296,7 +296,7 @@ func TestCheck_HarnessCatalogError(t *testing.T) {
 
 func TestCheck_GHPresent(t *testing.T) {
 	catalog := &fakeHarnessCatalog{inventory: agentsvc.Inventory{
-		Installed: []agentsvc.Info{{ID: "codex", Label: "Codex"}},
+		Installed: []agentsvc.Info{{ID: "opencode", Label: "OpenCode"}},
 	}}
 	svc := NewWithLookPath(catalog, lookPathFound(map[string]string{
 		"git":  "/usr/bin/git",
@@ -329,7 +329,7 @@ func TestCheck_GHPresent(t *testing.T) {
 // also the "Ready stays true when ONLY gh is unsatisfied" case.
 func TestCheck_GHMissing(t *testing.T) {
 	catalog := &fakeHarnessCatalog{inventory: agentsvc.Inventory{
-		Installed: []agentsvc.Info{{ID: "codex", Label: "Codex"}},
+		Installed: []agentsvc.Info{{ID: "opencode", Label: "OpenCode"}},
 	}}
 	svc := NewWithLookPath(catalog, lookPathFound(map[string]string{
 		"git":  "/usr/bin/git",
@@ -356,7 +356,7 @@ func TestCheck_GHMissing(t *testing.T) {
 }
 
 func TestCheckGitHubAuth_IsAdvisory(t *testing.T) {
-	catalog := &fakeHarnessCatalog{binary: agentsvc.Info{ID: "codex", Label: "Codex"}, binaryOK: true}
+	catalog := &fakeHarnessCatalog{binary: agentsvc.Info{ID: "opencode", Label: "OpenCode"}, binaryOK: true}
 	runner := &fakeCommandRunner{err: errors.New("not logged in")}
 	svc := NewWithCommandRunner(catalog, executableFinderFunc(lookPathFound(map[string]string{
 		"git": "/usr/bin/git", "tmux": "/usr/bin/tmux", "gh": "/usr/bin/gh",

@@ -8,7 +8,7 @@ export type ProjectAgentMenuOption = {
 };
 
 export const PROJECT_AGENT_MENU_OPTIONS: readonly ProjectAgentMenuOption[] = [
-	{ id: "codex", label: "Codex", icon: "/app-icons/agents/codex.svg", status: "", statusTone: "success", disabled: false },
+	{ id: "opencode", label: "OpenCode", icon: "/app-icons/agents/opencode.svg", status: "", statusTone: "success", disabled: false },
 	{ id: "copilot", label: "GitHub Copilot", icon: "/app-icons/agents/copilot-color.svg", status: "", statusTone: "success", disabled: false },
 	{ id: "cursor", label: "Cursor", icon: "/app-icons/agents/cursor.svg", status: "", statusTone: "success", disabled: false },
 	{ id: "opencode", label: "OpenCode", icon: "/app-icons/agents/opencode.svg", status: "", statusTone: "success", disabled: false },

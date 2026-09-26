@@ -808,7 +808,6 @@ type DelegateTaskRequest struct {
 	Brief     string              `json:"brief" maxLength:"16384"`
 	Agent     domain.AgentHarness `json:"agent,omitempty" enum:"opencode,fake"`
 	Model     string              `json:"model,omitempty" maxLength:"256"`
-	Effort    *string             `json:"effort,omitempty" maxLength:"64"`
 	// ApprovalMode is an optional per-session override. The UI uses the explicit
 	// bypass value only after the user accepts an approval-less Chat fallback.
 	ApprovalMode domain.PermissionMode `json:"approvalMode,omitempty" enum:"default,accept-edits,auto,bypass-permissions"`
@@ -1511,7 +1510,7 @@ type SteerConversationRequest struct {
 
 // SteerConversationResponse reports the turn the guidance joined.
 type SteerConversationResponse struct {
-	// ProviderTurnID is the turn that absorbed it. Against Codex this is the turn
+	// ProviderTurnID is the turn that absorbed it. Against opencode this is the turn
 	// that was already running — steering does not open a new one — so a client
 	// matches it against the turn it is already rendering.
 	ProviderTurnID string `json:"providerTurnId"`
@@ -1622,10 +1621,6 @@ type ConversationModelResponse struct {
 	// Default marks the model the provider would pick on its own, so a client can
 	// label it rather than inventing its own idea of a default.
 	Default bool `json:"default"`
-	// Efforts are the reasoning levels this model supports, in the provider's
-	// order. Empty means the model does not take one.
-	Efforts       []string `json:"efforts,omitempty"`
-	DefaultEffort string   `json:"defaultEffort,omitempty"`
 }
 
 // ConversationSkillsResponse is the named skills the provider will let this
@@ -1657,9 +1652,8 @@ type ConversationSkillResponse struct {
 // Every field is optional and an empty value means "use the provider's default",
 // so clearing a choice and never making one are the same thing.
 type ConversationTurnSettingsPayload struct {
-	Model           string `json:"model,omitempty"`
-	ReasoningEffort string `json:"reasoningEffort,omitempty"`
-	ApprovalMode    string `json:"approvalMode,omitempty" enum:"default,accept-edits,auto,bypass-permissions"`
+	Model        string `json:"model,omitempty"`
+	ApprovalMode string `json:"approvalMode,omitempty" enum:"default,accept-edits,auto,bypass-permissions"`
 }
 
 // ResolveConversationApprovalRequest answers a pending approval. DecisionID must

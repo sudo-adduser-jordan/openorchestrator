@@ -292,7 +292,7 @@ func (g *Guard) Nudge(ctx context.Context, id domain.SessionID, msg string) (Out
 //
 // waiting_input is only safe on a harness that reports a permission dialog AS
 // blocked. Harnesses that instead surface an ambiguous permission state as
-// waiting_input (codex maps permission-request to waiting_input — see
+// waiting_input (opencode maps permission-request to waiting_input — see
 // ports.BlockedActivitySignaler) would have this unsolicited write land on that
 // hidden dialog. acceptsWaitingInput is the adapter-declared capability that a
 // waiting_input prompt is a genuine idle composer, not a masked decision; a nil

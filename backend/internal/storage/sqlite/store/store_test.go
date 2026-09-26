@@ -167,7 +167,7 @@ func TestSessionPersistsDeterministicHandoffInputs(t *testing.T) {
 	got.Metadata.LatestAssistantUpdate = "The regression test has been added."
 	got.Metadata.LatestAssistantUpdateAt = got.Metadata.LatestAssistantUpdateAt.Add(time.Minute)
 	got.Metadata.NativeIdentityObservedAt = got.Metadata.NativeIdentityObservedAt.Add(time.Minute)
-	got.Metadata.NativeTranscriptPath = "/open-agents/transcripts/codex/session.jsonl"
+	got.Metadata.NativeTranscriptPath = "/open-agents/transcripts/opencode/session.jsonl"
 	got.Metadata.AgentSessionIDLaunchID = "launch-2"
 	got.Metadata.ConversationCheckpointState = domain.ConversationCheckpointPrompt
 	got.Metadata.ConversationCheckpointGeneration = "launch-2"

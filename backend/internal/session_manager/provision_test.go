@@ -245,8 +245,8 @@ func TestHookPATH(t *testing.T) {
 func TestEffectiveHarnessAndAgentConfig(t *testing.T) {
 	t.Parallel()
 	cfg := domain.ProjectConfig{
-		AgentConfig: domain.AgentConfig{Model: "base", Effort: "medium", Mode: "low", Permissions: domain.PermissionModeAuto},
-		Worker:      domain.RoleOverride{Harness: domain.HarnessOpenCode, AgentConfig: domain.AgentConfig{Model: "worker", Effort: "high", Mode: "high"}},
+		AgentConfig: domain.AgentConfig{Model: "base", Mode: "low", Permissions: domain.PermissionModeAuto},
+		Worker:      domain.RoleOverride{Harness: domain.HarnessOpenCode, AgentConfig: domain.AgentConfig{Model: "worker", Mode: "high"}},
 		Manager:     domain.RoleOverride{Harness: domain.HarnessOpenCode},
 	}
 
@@ -264,7 +264,7 @@ func TestEffectiveHarnessAndAgentConfig(t *testing.T) {
 
 	// Role override merges over the base agent config (set fields win; unset keep base).
 	got := effectiveAgentConfig(domain.HarnessOpenCode, domain.KindWorker, cfg)
-	if got.Model != "worker" || got.Effort != "high" || got.Mode != "high" || got.Permissions != domain.PermissionModeAuto {
+	if got.Model != "worker" || got.Mode != "high" || got.Permissions != domain.PermissionModeAuto {
 		t.Fatalf("merged worker config = %#v, want model=worker mode=high permissions=auto", got)
 	}
 	// Manager has no agent-config override, so the base config is used as-is.
@@ -286,7 +286,7 @@ func TestEffectiveHarnessAndAgentConfig(t *testing.T) {
 		AgentConfig: domain.AgentConfig{Model: "base", Mode: "low"},
 		Worker:      domain.RoleOverride{AgentConfig: domain.AgentConfig{Model: "worker", Mode: "high"}},
 	}
-	for _, harness := range []domain.AgentHarness{domain.AgentHarness("aider"), domain.AgentHarness("codex")} {
+	for _, harness := range []domain.AgentHarness{domain.AgentHarness("aider"), domain.AgentHarness("opencode")} {
 		got := effectiveAgentConfig(harness, domain.KindWorker, unpinned)
 		if got.Model != "worker" || got.Mode != "high" {
 			t.Fatalf("unpinned worker config for %q = %#v, want model=worker mode=high", harness, got)
@@ -294,30 +294,30 @@ func TestEffectiveHarnessAndAgentConfig(t *testing.T) {
 	}
 }
 
-func TestResolveChatAgentConfigKeepsModelAndDropsEffort(t *testing.T) {
+func TestResolveChatAgentConfigKeepsModel(t *testing.T) {
 	t.Parallel()
 	m := &Manager{}
-	project := domain.ProjectConfig{Worker: domain.RoleOverride{AgentConfig: domain.AgentConfig{Model: "old", Effort: "high"}}}
+	project := domain.ProjectConfig{Worker: domain.RoleOverride{AgentConfig: domain.AgentConfig{Model: "old"}}}
 	resolved := m.resolveChatAgentConfig(ports.SpawnConfig{
 		ProjectID: "p", Kind: domain.KindWorker, Harness: domain.HarnessOpenCode,
 		AgentConfig: ports.AgentConfig{Model: "new"},
 	}, project)
-	if resolved.Model != "new" || resolved.Effort != "" {
+	if resolved.Model != "new" {
 		t.Fatalf("resolved = %#v, want new model with provider defaults", resolved)
 	}
-	// A role-level effort never leaks into the launch.
+	// A role-level model never leaks into the launch.
 	resolved = m.resolveChatAgentConfig(ports.SpawnConfig{
 		ProjectID: "p", Kind: domain.KindWorker, Harness: domain.HarnessOpenCode,
 	}, project)
-	if resolved.Model != "old" || resolved.Effort != "" {
-		t.Fatalf("role config = %#v, want inherited model and no effort", resolved)
+	if resolved.Model != "old" {
+		t.Fatalf("role config = %+v, want inherited model", resolved)
 	}
-	// An explicit spawn effort and custom model resolve, with effort stripped.
+	// An explicit spawn model resolves.
 	resolved = m.resolveChatAgentConfig(ports.SpawnConfig{
 		ProjectID: "p", Kind: domain.KindWorker, Harness: domain.HarnessOpenCode,
-		AgentConfig: ports.AgentConfig{Model: "custom", Effort: "high"}, EffortOverride: true,
+		AgentConfig: ports.AgentConfig{Model: "custom"},
 	}, project)
-	if resolved.Model != "custom" || resolved.Effort != "" {
+	if resolved.Model != "custom" {
 		t.Fatalf("custom model = %#v", resolved)
 	}
 }

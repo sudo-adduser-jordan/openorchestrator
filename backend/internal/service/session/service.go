@@ -1126,10 +1126,6 @@ func mapSessionError(err error) error {
 	case errors.Is(err, ports.ErrRuntimeCommandLineTooLong):
 		return apierr.Invalid("WINDOWS_COMMAND_LINE_TOO_LONG",
 			"The agent launch command exceeds the Windows size limit. Shorten the task or project instructions.", nil)
-	case errors.Is(err, ports.ErrUnsupportedEffort):
-		return apierr.Invalid("UNSUPPORTED_EFFORT", err.Error(), nil)
-	case errors.Is(err, ports.ErrModelCapabilitiesUnavailable):
-		return apierr.Invalid("MODEL_CAPABILITIES_UNAVAILABLE", err.Error(), nil)
 	case errors.Is(err, ports.ErrRuntimeWorkspaceCwdMismatch):
 		return apierr.Conflict("WORKSPACE_CWD_MISMATCH", err.Error(), nil)
 	case errors.Is(err, ports.ErrWorkspaceLocked):

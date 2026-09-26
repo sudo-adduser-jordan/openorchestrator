@@ -47,14 +47,14 @@ func TestChatTurnSurvivesGracefulUpdaterStyleRestart(t *testing.T) {
 
 	restarted := startDaemon(t, dataDir)
 	restarted.awaitLiveController(session, 90*time.Second)
-	finished := restarted.awaitConversation(session, 3*time.Minute, "the detached real Codex turn to finish", func(s snapshot) bool {
+	finished := restarted.awaitConversation(session, 3*time.Minute, "the detached real OpenCode turn to finish", func(s snapshot) bool {
 		return terminal(s.Turns[len(s.Turns)-1].State)
 	})
 	hostAfter := persistentHostPID(t, dataDir, session)
 	last := finished.Turns[len(finished.Turns)-1]
 	t.Logf("graceful updater simulation: host_pid=%d->%d turn_state=%s", hostBefore, hostAfter, last.State)
 	if hostAfter != hostBefore || last.State != "completed" || !contains(finished.assistantText(), "SURVIVED-GRACEFUL") {
-		t.Fatalf("real Codex turn did not survive graceful replacement:\n%s", describe(finished))
+		t.Fatalf("real OpenCode turn did not survive graceful replacement:\n%s", describe(finished))
 	}
 }
 

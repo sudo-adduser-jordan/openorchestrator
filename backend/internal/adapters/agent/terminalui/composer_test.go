@@ -19,12 +19,12 @@ func TestLastPromptIsEmptyOrDimPlaceholder(t *testing.T) {
 		marker string
 		want   bool
 	}{
-		{name: "blank codex", output: "status\n\x1b[39m❯\u00a0", marker: "❯", want: true},
-		{name: "dim codex placeholder", output: "\x1b[39m❯\u00a0\x1b[2mclean up this code\x1b[0m", marker: "❯", want: true},
-		{name: "typed codex draft", output: "\x1b[39m❯\u00a0do not submit this", marker: "❯", want: false},
-		{name: "codex permission option", output: "permission\n❯ 1. Yes\n  2. No", marker: "❯", want: false},
-		{name: "dim codex placeholder", output: "› \x1b[2mExplain this codebase\x1b[0m\n\n\x1b[2mmodel · workspace\x1b[0m", marker: "›", want: true},
-		{name: "plain codex placeholder fails closed", output: "› Explain this codebase\nmodel · workspace", marker: "›", want: false},
+		{name: "blank opencode", output: "status\n\x1b[39m❯\u00a0", marker: "❯", want: true},
+		{name: "dim opencode placeholder", output: "\x1b[39m❯\u00a0\x1b[2mclean up this code\x1b[0m", marker: "❯", want: true},
+		{name: "typed opencode draft", output: "\x1b[39m❯\u00a0do not submit this", marker: "❯", want: false},
+		{name: "opencode permission option", output: "permission\n❯ 1. Yes\n  2. No", marker: "❯", want: false},
+		{name: "dim opencode placeholder", output: "› \x1b[2mExplain this codebase\x1b[0m\n\n\x1b[2mmodel · workspace\x1b[0m", marker: "›", want: true},
+		{name: "plain opencode placeholder fails closed", output: "› Explain this codebase\nmodel · workspace", marker: "›", want: false},
 		{name: "wrapped human draft fails closed", output: "❯\nhuman draft\nfooter", marker: "❯", want: false},
 		{name: "leading blank rows in human draft fail closed", output: "❯\n\nhuman draft", marker: "❯", want: false},
 		{name: "historical prompt is outside lookback", output: "❯\n1\n2\n3\n4\n5\n6\n7\n8\n9", marker: "❯", want: false},
@@ -139,17 +139,17 @@ func TestLastBorderedPromptComposerState(t *testing.T) {
 
 func TestLastBorderedPromptComposerStateIgnoresProviderChromeLabels(t *testing.T) {
 	rule := strings.Repeat("─", 48)
-	output := rule + "\n❯  Codex\n" + rule + "\n  glm-5.3 low [Rate limited]"
+	output := rule + "\n❯  OpenCode\n" + rule + "\n  glm-5.3 low [Rate limited]"
 	if got := LastBorderedPromptComposerState(output, "❯"); got != ComposerDraft {
 		t.Fatalf("provider label without chrome list = %v, want draft (unchanged default)", got)
 	}
-	if got := LastBorderedPromptComposerState(output, "❯", "Codex"); got != ComposerEmpty {
+	if got := LastBorderedPromptComposerState(output, "❯", "OpenCode"); got != ComposerEmpty {
 		t.Fatalf("provider label with chrome list = %v, want empty", got)
 	}
 	if got := LastBorderedPromptComposerState(output, "❯", "Opencode"); got != ComposerDraft {
 		t.Fatalf("unrelated chrome label = %v, want draft", got)
 	}
-	if got := LastPromptComposerState(output, "❯", "Codex"); got != ComposerEmpty {
+	if got := LastPromptComposerState(output, "❯", "OpenCode"); got != ComposerEmpty {
 		t.Fatalf("footer-free fallback with chrome list = %v, want empty (rule closes the region)", got)
 	}
 }
@@ -158,25 +158,25 @@ func TestPromptChromeLabelsAreExemptOnContinuationRows(t *testing.T) {
 	rule := strings.Repeat("─", 48)
 	// The provider can paint its label on its own row inside the bordered
 	// composer, below the marker row. That row is chrome too, not a draft.
-	bordered := rule + "\n❯ \x1b[7m \x1b[0m\n Codex\n" + rule + "\n⏵⏵ auto mode on"
+	bordered := rule + "\n❯ \x1b[7m \x1b[0m\n OpenCode\n" + rule + "\n⏵⏵ auto mode on"
 	if got := LastBorderedPromptComposerState(bordered, "❯"); got != ComposerDraft {
 		t.Fatalf("bordered label row without chrome list = %v, want draft (unchanged default)", got)
 	}
-	if got := LastBorderedPromptComposerState(bordered, "❯", "Codex"); got != ComposerEmpty {
+	if got := LastBorderedPromptComposerState(bordered, "❯", "OpenCode"); got != ComposerEmpty {
 		t.Fatalf("bordered label row with chrome list = %v, want empty", got)
 	}
 	// Same for the footer-free fallback: a label row below the prompt is not
 	// human input.
-	footerFree := "❯ \x1b[7m \x1b[0m\nCodex\n"
+	footerFree := "❯ \x1b[7m \x1b[0m\nOpenCode\n"
 	if got := LastPromptComposerState(footerFree, "❯"); got != ComposerDraft {
 		t.Fatalf("footer-free label row without chrome list = %v, want draft (unchanged default)", got)
 	}
-	if got := LastPromptComposerState(footerFree, "❯", "Codex"); got != ComposerEmpty {
+	if got := LastPromptComposerState(footerFree, "❯", "OpenCode"); got != ComposerEmpty {
 		t.Fatalf("footer-free label row with chrome list = %v, want empty", got)
 	}
 	// A label followed by human text on the same row is still a draft.
-	mixed := rule + "\n❯ Codex review please\n" + rule + "\n⏵⏵ auto mode on"
-	if got := LastBorderedPromptComposerState(mixed, "❯", "Codex"); got != ComposerDraft {
+	mixed := rule + "\n❯ OpenCode review please\n" + rule + "\n⏵⏵ auto mode on"
+	if got := LastBorderedPromptComposerState(mixed, "❯", "OpenCode"); got != ComposerDraft {
 		t.Fatalf("label-prefixed human text = %v, want draft", got)
 	}
 }

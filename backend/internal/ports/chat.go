@@ -23,7 +23,7 @@ import (
 //   - shell-terminal lifecycle is unrelated to conversation lifecycle.
 
 // Errors a Chat driver returns. They map to stable API error codes, so a client
-// can tell "this harness cannot do Chat" from "Codex is not logged in".
+// can tell "this harness cannot do Chat" from "opencode is not logged in".
 var (
 	// ErrChatUnsupported means the harness has no Chat driver at all.
 	ErrChatUnsupported = errors.New("chat mode unsupported for harness")
@@ -288,9 +288,6 @@ type ChatStartConfig struct {
 	PrepareEnv func(context.Context) (map[string]string, error)
 	// Model is optional; empty defers to the provider's configured default.
 	Model string
-	// Effort is an optional provider-advertised model tuning value; empty
-	// defers to the provider's configured default.
-	Effort string
 	// Permissions is Open Agents's existing per-session approval policy. Drivers map it
 	// onto their provider's native approval and sandbox settings.
 	Permissions PermissionMode
@@ -325,9 +322,7 @@ type ChatResumeConfig struct {
 	// See ChatStartConfig.PrepareEnv.
 	PrepareEnv func(context.Context) (map[string]string, error)
 	// Model is optional; empty keeps the provider conversation's current model.
-	Model string
-	// Effort is optional; empty keeps the provider conversation's current effort.
-	Effort      string
+	Model      string
 	Permissions PermissionMode
 	// SystemPrompt is recomputed by the session manager on restore and reapplied
 	// to the provider process. It is not persisted in the conversation transcript.
@@ -407,8 +402,6 @@ type ChatUserMessage struct {
 type ChatTurnSettings struct {
 	// Model is the provider's model id, from ChatModel.ID.
 	Model string
-	// Effort is how much reasoning to spend, from ChatModel.Efforts.
-	Effort string
 	// Approval is Open Agents's permission mode for this turn. The driver maps it onto
 	// whatever approval policy and sandbox its provider understands.
 	Approval PermissionMode
@@ -417,7 +410,7 @@ type ChatTurnSettings struct {
 // IsZero reports whether nothing was chosen, so a dispatch can omit the fields
 // entirely rather than sending empty strings the provider would have to interpret.
 func (s ChatTurnSettings) IsZero() bool {
-	return s.Model == "" && s.Effort == "" && s.Approval == ""
+	return s.Model == "" && s.Approval == ""
 }
 
 // ChatModel is one model the provider offers for a conversation.
@@ -431,11 +424,6 @@ type ChatModel struct {
 	Description string
 	// Default marks the model the provider would pick on its own.
 	Default bool
-	// Efforts are the reasoning levels this model supports, in the provider's
-	// order. Empty means the model does not take one.
-	Efforts []string
-	// DefaultEffort is the level the provider uses when none is chosen.
-	DefaultEffort string
 }
 
 // ChatModelLister is implemented by drivers whose provider can enumerate models.
@@ -685,7 +673,7 @@ type ChatTurnRef struct {
 // provider notification from racing ahead of the correlation record needed to
 // project it.
 //
-// Drivers whose SendTurn already receives a provider acknowledgement (Codex's
+// Drivers whose SendTurn already receives a provider acknowledgement (opencode's
 // app-server, for example) do not implement this interface.
 type ChatDeferredTurnStarter interface {
 	StartDeferredTurn(providerTurnID string) error
@@ -1078,7 +1066,7 @@ type ChatProviderEventAcknowledger interface {
 // first, settled, and with stable ProviderEventID values so importing the same
 // native history after every interface switch is idempotent.
 //
-// This is deliberately provider-neutral. Codex implements it with thread/read;
+// This is deliberately provider-neutral. opencode implements it with thread/read;
 // ACP implements it with session/load replay. Neither leaks provider wire formats
 // into the Chat service.
 type ChatHistoryReader interface {

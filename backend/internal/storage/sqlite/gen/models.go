@@ -50,20 +50,6 @@ type ChangeLog struct {
 	CreatedAt time.Time
 }
 
-type CodexAccountSwitch struct {
-	ID                     string
-	SourceAccountID        string
-	TargetAccountID        string
-	IdempotencyKey         string
-	Phase                  string
-	FailureCode            string
-	CredentialsCommittedAt sql.NullTime
-	CreatedAt              time.Time
-	UpdatedAt              time.Time
-	CompletedAt            sql.NullTime
-	SourceKind             string
-}
-
 type Conversation struct {
 	ID                         string
 	Scope                      domain.ConversationScope
@@ -555,19 +541,6 @@ type UsageBinding struct {
 	LastErrorCode  string
 	UpdatedAt      time.Time
 	ProviderHint   string
-}
-
-type UsageCodexPendingChild struct {
-	BindingID       int64
-	NativeSessionID string
-}
-
-type UsageCodexSourceDiscovery struct {
-	SourceID               int64
-	BindingID              int64
-	NativeSessionID        string
-	DiscoveredChildIdsJson string
-	HasMixedChildTypes     int64
 }
 
 type UsageSessionIntegrity struct {

@@ -136,17 +136,14 @@ function SettingsBody({
 		workerAgent: config.worker?.agent ?? "",
 		managerAgent: config.manager?.agent ?? "",
 		workerModel: config.worker?.agentConfig?.model ?? config.agentConfig?.model ?? "",
-		workerEffort: config.worker?.agentConfig?.effort ?? config.agentConfig?.effort ?? "",
 		workerPermissions: config.worker?.agentConfig?.permissions ?? config.agentConfig?.permissions ?? "",
 		managerModel: config.manager?.agentConfig?.model ?? config.agentConfig?.model ?? "",
-		managerEffort: config.manager?.agentConfig?.effort ?? config.agentConfig?.effort ?? "",
 		managerPermissions: config.manager?.agentConfig?.permissions ?? config.agentConfig?.permissions ?? "",
 		workerMode: config.worker?.agentConfig?.mode ?? config.agentConfig?.mode ?? "",
 		managerMode: config.manager?.agentConfig?.mode ?? config.agentConfig?.mode ?? "",
 		reviewerHarness: config.reviewers?.[0]?.harness ?? "",
 		reviewerModel: config.reviewers?.[0]?.agentConfig?.model ?? config.agentConfig?.model ?? "",
 		reviewerMode: config.reviewers?.[0]?.agentConfig?.mode ?? config.agentConfig?.mode ?? "",
-		reviewerEffort: config.reviewers?.[0]?.agentConfig?.effort ?? config.agentConfig?.effort ?? "",
 		reviewerPermissions: config.reviewers?.[0]?.agentConfig?.permissions ?? config.agentConfig?.permissions ?? "",
 		autoReview: config.autoReview ?? false,
 		intakeEnabled: intake.enabled ?? false,
@@ -157,7 +154,6 @@ function SettingsBody({
 	const [showSaving, setShowSaving] = useState(false);
 	const [replacementError, setReplacementError] = useState<string | null>(null);
 	const [validationError, setValidationError] = useState<string | null>(null);
-	const [tuningValidity, setTuningValidity] = useState({ worker: true, manager: true, reviewer: true });
 	const initialManagerAgent = config.manager?.agent ?? "";
 	const missingRequiredAgent = form.workerAgent === "" || form.managerAgent === "";
 	const agentsQuery = useAgentReadinessQuery();
@@ -201,7 +197,7 @@ function SettingsBody({
 						worker: {
 							...config.worker,
 							agent: form.workerAgent,
-							agentConfig: buildRoleAgentConfig(config.worker?.agentConfig, form.workerModel, form.workerMode, form.workerAgent === "codex" ? form.workerEffort : "", form.workerPermissions),
+							agentConfig: buildRoleAgentConfig(config.worker?.agentConfig, form.workerModel, form.workerMode, "", form.workerPermissions),
 						},
 						manager: {
 							...config.manager,
@@ -210,7 +206,7 @@ function SettingsBody({
 								config.manager?.agentConfig,
 								form.managerModel,
 								form.managerMode,
-								form.managerAgent === "codex" ? form.managerEffort : "",
+								"",
 								form.managerPermissions,
 							),
 						},
@@ -229,7 +225,7 @@ function SettingsBody({
 						worker: {
 							...config.worker,
 							agent: form.workerAgent,
-							agentConfig: buildRoleAgentConfig(config.worker?.agentConfig, form.workerModel, form.workerMode, form.workerAgent === "codex" ? form.workerEffort : "", form.workerPermissions),
+							agentConfig: buildRoleAgentConfig(config.worker?.agentConfig, form.workerModel, form.workerMode, "", form.workerPermissions),
 						},
 						manager: {
 							...config.manager,
@@ -238,7 +234,7 @@ function SettingsBody({
 								config.manager?.agentConfig,
 								form.managerModel,
 								form.managerMode,
-								form.managerAgent === "codex" ? form.managerEffort : "",
+								"",
 								form.managerPermissions,
 							),
 						},
@@ -249,7 +245,7 @@ function SettingsBody({
 						reviewers: form.reviewerHarness
 							? [{
 									harness: form.reviewerHarness,
-									agentConfig: buildRoleAgentConfig(existingReviewerAgentConfig, form.reviewerModel, form.reviewerMode, form.reviewerHarness === "codex" ? form.reviewerEffort : "", form.reviewerPermissions),
+									agentConfig: buildRoleAgentConfig(existingReviewerAgentConfig, form.reviewerModel, form.reviewerMode, "", form.reviewerPermissions),
 								}]
 							: undefined,
 						trackerIntake: buildIntake(intakeForm, config.trackerIntake),
@@ -438,7 +434,7 @@ function SettingsBody({
 								disabled={agentsQuery.isFetching && agentCatalog === undefined}
 								invalid={validationError !== null && form.workerAgent === ""}
 								onChange={(v) =>
-									setForm((f) => ({ ...f, workerAgent: v, workerModel: "", workerMode: "", workerEffort: "" }))
+									setForm((f) => ({ ...f, workerAgent: v, workerModel: "", workerMode: "" }))
 								}
 							/>
 						}
@@ -449,11 +445,8 @@ function SettingsBody({
 								projectId={projectId}
 								model={form.workerModel}
 								mode={form.workerMode}
-								effort={form.workerEffort}
 								onModelChange={(workerModel) => setForm((f) => ({ ...f, workerModel }))}
 								onModeChange={(workerMode) => setForm((f) => ({ ...f, workerMode }))}
-								onEffortChange={(workerEffort) => setForm((f) => ({ ...f, workerEffort }))}
-								onValidityChange={(valid) => setTuningValidity((value) => ({ ...value, worker: valid }))}
 							/>
 						}
 						managerArea={
@@ -484,11 +477,8 @@ function SettingsBody({
 								projectId={projectId}
 								model={form.managerModel}
 								mode={form.managerMode}
-								effort={form.managerEffort}
 								onModelChange={(managerModel) => setForm((f) => ({ ...f, managerModel }))}
 								onModeChange={(managerMode) => setForm((f) => ({ ...f, managerMode }))}
-								onEffortChange={(managerEffort) => setForm((f) => ({ ...f, managerEffort }))}
-								onValidityChange={(valid) => setTuningValidity((value) => ({ ...value, manager: valid }))}
 							/>
 						}
 						permissions={{
@@ -527,7 +517,7 @@ function SettingsBody({
 									...f,
 									reviewerHarness: v,
 									...(v !== f.reviewerHarness ? {
-										reviewerModel: "", reviewerMode: "", reviewerEffort: "",
+										reviewerModel: "", reviewerMode: "",
 										reviewerPermissions: "",
 									} : {}),
 									}))
@@ -546,11 +536,8 @@ function SettingsBody({
 								projectId={projectId}
 								model={form.reviewerModel}
 								mode={form.reviewerMode}
-								effort={form.reviewerEffort}
 								onModelChange={(reviewerModel) => setForm((f) => ({ ...f, reviewerModel }))}
 								onModeChange={(reviewerMode) => setForm((f) => ({ ...f, reviewerMode }))}
-								onEffortChange={(reviewerEffort) => setForm((f) => ({ ...f, reviewerEffort }))}
-								onValidityChange={(valid) => setTuningValidity((value) => ({ ...value, reviewer: valid }))}
 							/>
 						) : null}
 						<SettingsRow label={`${"Reviewer"} approval`}>
@@ -654,10 +641,8 @@ function AgentModelField({
 	projectId,
 	model,
 	mode,
-	effort,
 	onModelChange,
 	onModeChange,
-	onEffortChange,
 	onValidityChange,
 }: {
 	role: "worker" | "manager" | "reviewer";
@@ -665,11 +650,8 @@ function AgentModelField({
 	projectId: string;
 	model: string;
 	mode: string;
-	effort: string;
 	onModelChange: (value: string) => void;
 	onModeChange: (value: string) => void;
-	onEffortChange: (value: string) => void;
-	onValidityChange: (valid: boolean) => void;
 }) {
 	const queryClient = useQueryClient();
 	const query = useQuery(agentModelsQueryOptions(agentId, projectId));
@@ -769,10 +751,8 @@ function AgentModelField({
 						onChange={selectCatalogModel}
 						onCustom={selectCustomModel}
 						triggerClassName="justify-end"
-						compact={agentId === "codex"}
-						tuning={agentId === "codex" ? {
-							effort,
-							onEffortChange,
+						compact={agentId === "opencode"}
+						tuning={agentId === "opencode" ? {
 							onValidityChange,
 							roleLabel: ({"worker": "Worker", "manager": "Manager", "reviewer": "Reviewer"}[role] ?? role),
 						} : undefined}
@@ -859,7 +839,6 @@ function buildRoleAgentConfig(
 	existing: components["schemas"]["AgentConfig"] | undefined,
 	model: string,
 	mode: string,
-	effort: string,
 	permissions: string,
 ): components["schemas"]["AgentConfig"] | undefined {
 	const next = { ...existing };
@@ -867,8 +846,6 @@ function buildRoleAgentConfig(
 	else delete next.model;
 	if (mode) next.mode = mode;
 	else delete next.mode;
-	if (effort) next.effort = effort;
-	else delete next.effort;
 	if (permissions) next.permissions = permissions as components["schemas"]["AgentConfig"]["permissions"];
 	else delete next.permissions;
 	return Object.keys(next).length > 0 ? next : undefined;

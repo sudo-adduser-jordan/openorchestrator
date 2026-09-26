@@ -455,7 +455,7 @@ export const RequiredAgentField = memo(function RequiredAgentField({
 
 	const selectedOption = options.find((agent) => agent.id === value);
 
-	// Chip: the value reads as part of a sentence ("Runs with Codex") rather than
+	// Chip: the value reads as part of a sentence ("Runs with opencode") rather than
 	// as a form field, so the label is carried by that sentence, not by a <Label>.
 	// Built on the same SettingsOptionMenu as the settings-row variant (and the
 	// model chip beside it) so both halves of the pill share one dropdown

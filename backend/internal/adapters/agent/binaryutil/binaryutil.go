@@ -28,7 +28,7 @@ import (
 // bases (APPDATA, LOCALAPPDATA, home) that are unset simply skip their
 // candidates.
 type BinarySpec struct {
-	// Label prefixes the ErrAgentBinaryNotFound error, e.g. "codex".
+	// Label prefixes the ErrAgentBinaryNotFound error, e.g. "opencode".
 	Label string
 
 	// Names are the binary names looked up on PATH on non-Windows, in order.

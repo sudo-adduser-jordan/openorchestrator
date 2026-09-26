@@ -61,7 +61,7 @@ func TestChatSurvivesADaemonRestartWithNativeContext(t *testing.T) {
 	}
 }
 
-// The detached Codex host is outside the daemon's process group. Even SIGKILL of
+// The detached OpenCode host is outside the daemon's process group. Even SIGKILL of
 // the daemon must leave the provider turn running for the replacement to adopt.
 func TestChatRestartMidTurnKeepsCodexRunning(t *testing.T) {
 	requireE2E(t)
@@ -89,7 +89,7 @@ func TestChatRestartMidTurnKeepsCodexRunning(t *testing.T) {
 	hostAfter := persistentHostPID(t, dataDir, session)
 	t.Logf("abrupt daemon simulation: host_pid=%d->%d turn_state=%s", hostBefore, hostAfter, last.State)
 	if hostAfter != hostBefore || last.State != "completed" || !contains(snap.assistantText(), "SURVIVED-SIGKILL") {
-		t.Fatalf("real Codex turn did not survive abrupt daemon replacement:\n%s", describe(snap))
+		t.Fatalf("real OpenCode turn did not survive abrupt daemon replacement:\n%s", describe(snap))
 	}
 }
 

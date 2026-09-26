@@ -339,7 +339,7 @@ func (transitionAgent) NativeConversationID(_ context.Context, session ports.Ses
 	return id, id != "", nil
 }
 
-// codexTransitionAgent reproduces the parts of the removed Codex adapter that
+// codexTransitionAgent reproduces the parts of the removed OpenCode adapter that
 // the interface-transition tests exercised: the rollout-transcript probe that
 // distinguishes a reserved native id from a resumable conversation, and the
 // initial-composer surface detection that proves an untouched conversation.
@@ -398,7 +398,7 @@ func (codexTransitionAgent) InspectTerminalSurface(output string) ports.Terminal
 }
 
 // codexTerminalSurface mirrors the removed adapter's initial-composer probe: an
-// "OpenAI Codex (v…)" header with exactly one prompt row is untouched.
+// "OpenAI OpenCode (v…)" header with exactly one prompt row is untouched.
 func codexTerminalSurface(output string) ports.TerminalSurfaceObservation {
 	observation := ports.TerminalSurfaceObservation{Composer: ports.TerminalComposerEmpty}
 	header := false
@@ -408,7 +408,7 @@ func codexTerminalSurface(output string) ports.TerminalSurfaceObservation {
 		if line == "" {
 			continue
 		}
-		if strings.Contains(line, "OpenAI Codex (v") {
+		if strings.Contains(line, "OpenAI OpenCode (v") {
 			header = true
 		}
 		if strings.HasPrefix(line, "›") {
@@ -1109,7 +1109,7 @@ func TestInterfaceTransitionStatusBlocksFreshStartWhenConversationMetadataExists
 	manager.agents = singleAgent{agent: codexTransitionAgent{}}
 	runtime.outputForCall = func(int) string {
 		return "╭────────────────────────╮\n" +
-			"│ >_ OpenAI Codex (v0.147.0) │\n" +
+			"│ >_ OpenAI OpenCode (v0.147.0) │\n" +
 			"╰────────────────────────╯\n\n" +
 			"Tip: Try the Desktop app.\n\n" +
 			"\x1b[1m›\x1b[0m \x1b[2mSummarize recent commits\x1b[0m\n\n" +

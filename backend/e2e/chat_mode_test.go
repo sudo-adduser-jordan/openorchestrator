@@ -22,7 +22,7 @@ func TestChatModeSpawnPrecedenceAndDefaultIsolation(t *testing.T) {
 		map[string]any{"defaultSessionMode": "chat"}, nil)
 
 	fromDefault := spawn(t, d, map[string]any{
-		"projectId": project, "kind": "worker", "harness": "codex",
+		"projectId": project, "kind": "worker", "harness": "opencode",
 	})
 	if fromDefault.Session.Mode != "chat" {
 		t.Fatalf("session spawned under a chat default has mode %q", fromDefault.Session.Mode)
@@ -31,7 +31,7 @@ func TestChatModeSpawnPrecedenceAndDefaultIsolation(t *testing.T) {
 	// An explicit request outranks the default. This is the path `open-agents spawn --mode`
 	// uses, and it must not be silently normalized to the default.
 	explicitTUI := spawn(t, d, map[string]any{
-		"projectId": project, "kind": "worker", "harness": "codex", "mode": "tui",
+		"projectId": project, "kind": "worker", "harness": "opencode", "mode": "tui",
 	})
 	if explicitTUI.Session.Mode != "tui" {
 		t.Fatalf("explicit --mode tui produced %q", explicitTUI.Session.Mode)
@@ -51,7 +51,7 @@ func TestChatModeSpawnPrecedenceAndDefaultIsolation(t *testing.T) {
 	}
 
 	afterFlip := spawn(t, d, map[string]any{
-		"projectId": project, "kind": "worker", "harness": "codex",
+		"projectId": project, "kind": "worker", "harness": "opencode",
 	})
 	if afterFlip.Session.Mode != "tui" {
 		t.Fatalf("session spawned after the flip has mode %q, want tui", afterFlip.Session.Mode)
@@ -119,7 +119,7 @@ func TestChatSpawnPromptProducesAnAnsweredTurn(t *testing.T) {
 	project := seedProject(t, d, "spawnprompt")
 
 	session := spawn(t, d, map[string]any{
-		"projectId": project, "kind": "worker", "harness": "codex", "mode": "chat",
+		"projectId": project, "kind": "worker", "harness": "opencode", "mode": "chat",
 		"prompt": "Reply with exactly: SPAWN-OK",
 	}).Session.ID
 

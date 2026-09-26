@@ -249,7 +249,7 @@ export function ServiceJsonLd() {
 		name: `${COMPANY.NAME} agent management`,
 		serviceType: "AI coding agent management platform",
 		description:
-			"Run and orchestrate parallel AI coding agents (Codex, OpenCode, and any CLI agent) in isolated Git worktrees, with diff review, persistent terminals, scheduled automations, and an MCP server for programmatic control.",
+			"Run and orchestrate parallel AI coding agents (OpenCode, OpenCode, and any CLI agent) in isolated Git worktrees, with diff review, persistent terminals, scheduled automations, and an MCP server for programmatic control.",
 		provider: {
 			"@type": "Organization",
 			"@id": ORGANIZATION_ID,

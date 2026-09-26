@@ -48,19 +48,19 @@ func TestUsageBindingAndSourceIdempotency(t *testing.T) {
 
 	src := mustInsertUsageSource(t, s, now, domain.UsageSourceRecord{
 		BindingID:       binding.ID,
-		Kind:            domain.UsageSourceKind("codex_rollout"),
+		Kind:            domain.UsageSourceKind("kimi_wire"),
 		NativeSessionID: "child-thread",
-		ArtifactPath:    "/tmp/codex/rollout.jsonl",
+		ArtifactPath:    "/tmp/kimi/wire.jsonl",
 		FileIdentity:    "dev:ino",
 		State:           domain.UsageSourcePending,
 	})
 	srcAgain := mustInsertUsageSource(t, s, now.Add(time.Hour), domain.UsageSourceRecord{
 		BindingID:       binding.ID,
-		Kind:            domain.UsageSourceKind("codex_rollout"),
+		Kind:            domain.UsageSourceKind("kimi_wire"),
 		NativeSessionID: "child-thread-updated",
-		ArtifactPath:    "/tmp/codex/rollout.jsonl",
+		ArtifactPath:    "/tmp/kimi/wire.jsonl",
 		FileIdentity:    "dev:ino:updated",
-		ParserStateJSON: `{"version":1,"source_kind":"codex_rollout","codex":{}}`,
+		ParserStateJSON: `{"version":1,"source_kind":"kimi_wire","kimi":{}}`,
 		State:           domain.UsageSourcePending,
 	})
 	if srcAgain.ID != src.ID || srcAgain.NativeSessionID != "child-thread-updated" ||
@@ -246,8 +246,8 @@ func TestInsertUsageSourceRejectsNonObjectParserState(t *testing.T) {
 	})
 	_, err := s.InsertUsageSource(ctx, domain.UsageSourceRecord{
 		BindingID:       binding.ID,
-		Kind:            domain.UsageSourceKind("codex_rollout"),
-		ArtifactPath:    "/tmp/codex/rollout.jsonl",
+		Kind:            domain.UsageSourceKind("kimi_wire"),
+		ArtifactPath:    "/tmp/kimi/wire.jsonl",
 		ParserStateJSON: `[]`,
 		State:           domain.UsageSourcePending,
 		UpdatedAt:       now,
@@ -268,7 +268,7 @@ func TestReplaceUsageSourceRollsBackRetirementWhenInsertFails(t *testing.T) {
 		BindingID:       source.BindingID,
 		Kind:            domain.UsageSourceKind("invalid"),
 		NativeSessionID: source.NativeSessionID,
-		ArtifactPath:    "/tmp/codex/replacement.jsonl",
+		ArtifactPath:    "/tmp/kimi/replacement.jsonl",
 		FileIdentity:    "replacement",
 		Generation:      source.Generation + 1,
 		State:           domain.UsageSourcePending,
@@ -306,9 +306,9 @@ func TestUsageMutationsEmitSessionUpdatedCDC(t *testing.T) {
 	mustNoError(t, err)
 	source := mustInsertUsageSource(t, s, now, domain.UsageSourceRecord{
 		BindingID:       binding.ID,
-		Kind:            domain.UsageSourceKind("codex_rollout"),
+		Kind:            domain.UsageSourceKind("kimi_wire"),
 		NativeSessionID: "child-thread",
-		ArtifactPath:    "/tmp/codex/rollout.jsonl",
+		ArtifactPath:    "/tmp/kimi/wire.jsonl",
 		FileIdentity:    "dev:ino",
 		State:           domain.UsageSourcePending,
 	})
@@ -379,12 +379,12 @@ func TestApplyUsageChunkAtomicReplayAndTokenAggregates(t *testing.T) {
 	source := seedUsageSource(t, s, sess, now)
 
 	event := usageEvent("event-1", canonicalUsageTokens(100, 50, 50, 20))
-	event.ProviderUsageJSON = codexProviderUsage(10, 3)
+	event.ProviderUsageJSON = kimiProviderUsage(10, 3)
 
 	err := s.ApplyUsageChunk(ctx, source.ID, 0, source.UpdatedAt, domain.SourceCursorState{
 		ByteOffset:      100,
 		State:           domain.UsageSourceActive,
-		ParserStateJSON: `{"version":1,"source_kind":"codex_rollout","codex":{"baseline":{"input_tokens":100}}}`,
+		ParserStateJSON: `{"version":1,"source_kind":"kimi_wire","kimi":{"baseline":{"input_tokens":100}}}`,
 		UpdatedAt:       now,
 	}, []domain.ModelUsageEvent{event})
 	if err != nil {
@@ -393,7 +393,7 @@ func TestApplyUsageChunkAtomicReplayAndTokenAggregates(t *testing.T) {
 	err = s.ApplyUsageChunk(ctx, source.ID, 100, now, domain.SourceCursorState{
 		ByteOffset:      120,
 		State:           domain.UsageSourceActive,
-		ParserStateJSON: `{"version":1,"source_kind":"codex_rollout","codex":{"baseline":{"input_tokens":100},"model_id":"gpt-5.6"}}`,
+		ParserStateJSON: `{"version":1,"source_kind":"kimi_wire","kimi":{"baseline":{"input_tokens":100},"model_id":"gpt-5.6"}}`,
 		UpdatedAt:       now.Add(time.Second),
 	}, []domain.ModelUsageEvent{event})
 	if err != nil {
@@ -434,7 +434,7 @@ func TestApplyUsageChunkPersistsProviderSplits(t *testing.T) {
 	})
 	source := mustInsertUsageSource(t, s, now, domain.UsageSourceRecord{
 		BindingID:       binding.ID,
-		Kind:            domain.UsageSourceKind("codex_rollout"),
+		Kind:            domain.UsageSourceKind("kimi_wire"),
 		NativeSessionID: "root-thread",
 		ArtifactPath:    "/tmp/agent/transcript.jsonl",
 		State:           domain.UsageSourcePending,
@@ -640,7 +640,7 @@ func TestApplyUsageChunkProviderUsageConflictsRollback(t *testing.T) {
 			},
 			conflicting: func(key string) domain.ModelUsageEvent {
 				event := usageEvent(key, canonicalUsageTokens(10, 0, 10, 1))
-				event.ProviderUsageJSON = codexProviderUsage(0, 1)
+				event.ProviderUsageJSON = kimiProviderUsage(0, 1)
 				return event
 			},
 		},
@@ -702,7 +702,7 @@ func TestApplyUsageChunkProviderUsageEnrichmentAdvancesCursorWithoutDuplicate(t 
 			name: "OpenAI", harness: domain.HarnessOpenCode, wantInput: 10, wantOutput: 1,
 			richer: func() domain.ModelUsageEvent {
 				event := usageEvent("event-1", canonicalUsageTokens(10, 0, 10, 1))
-				event.ProviderUsageJSON = codexProviderUsage(0, 1)
+				event.ProviderUsageJSON = kimiProviderUsage(0, 1)
 				return event
 			},
 		},
@@ -768,7 +768,7 @@ func readStoredProviderUsage(t *testing.T, dataDir, sourceEventKey string) strin
 	return stored.String
 }
 
-func TestUsageBindingIgnoresChildrenFromSupersededCodexGeneration(t *testing.T) {
+func TestUsageBindingIgnoresChildrenFromSupersededKimiGeneration(t *testing.T) {
 	s := newTestStore(t)
 	ctx := context.Background()
 	sess := seedUsageSession(t, s, domain.HarnessOpenCode)
@@ -781,14 +781,14 @@ func TestUsageBindingIgnoresChildrenFromSupersededCodexGeneration(t *testing.T) 
 		NativeRootID: rootID,
 		State:        domain.UsageBindingFinalizing,
 	})
-	oldState := `{"version":1,"source_kind":"codex_rollout","codex":{"baseline":{},"pending_spawn_call_ids":[],"discovered_child_ids":["` + childID + `"]}}`
-	emptyState := `{"version":1,"source_kind":"codex_rollout","codex":{"baseline":{},"pending_spawn_call_ids":[],"discovered_child_ids":[]}}`
+	oldState := `{"version":1,"source_kind":"kimi_wire","kimi":{"baseline":{},"pending_spawn_call_ids":[],"discovered_child_ids":["` + childID + `"]}}`
+	emptyState := `{"version":1,"source_kind":"kimi_wire","kimi":{"baseline":{},"pending_spawn_call_ids":[],"discovered_child_ids":[]}}`
 	for generation, state := range []string{oldState, emptyState} {
 		mustInsertUsageSource(t, s, now, domain.UsageSourceRecord{
 			BindingID:       binding.ID,
-			Kind:            domain.UsageSourceKind("codex_rollout"),
+			Kind:            domain.UsageSourceKind("kimi_wire"),
 			NativeSessionID: rootID,
-			ArtifactPath:    "/tmp/codex/root.jsonl",
+			ArtifactPath:    "/tmp/kimi/root.jsonl",
 			FileIdentity:    fmt.Sprintf("root-%d", generation),
 			Generation:      int64(generation),
 			ParserStateJSON: state,
@@ -1046,7 +1046,7 @@ func TestUsageSessionAggregatesParentChildAndMultipleBindingsExactlyOnce(t *test
 		t.Helper()
 		return mustInsertUsageSource(t, s, now, domain.UsageSourceRecord{
 			BindingID:       binding.ID,
-			Kind:            domain.UsageSourceKind("codex_rollout"),
+			Kind:            domain.UsageSourceKind("kimi_wire"),
 			NativeSessionID: nativeID,
 			SubagentID:      subagentID,
 			ArtifactPath:    path,
@@ -1067,10 +1067,10 @@ func TestUsageSessionAggregatesParentChildAndMultipleBindingsExactlyOnce(t *test
 	}
 
 	rootBinding := newBinding("root-thread")
-	parent := newSource(rootBinding, "root-thread", "", "/tmp/codex/root.jsonl")
-	child := newSource(rootBinding, "child-thread", "child-thread", "/tmp/codex/child.jsonl")
+	parent := newSource(rootBinding, "root-thread", "", "/tmp/kimi/root.jsonl")
+	child := newSource(rootBinding, "child-thread", "child-thread", "/tmp/kimi/child.jsonl")
 	secondBinding := newBinding("resumed-thread")
-	resumed := newSource(secondBinding, "resumed-thread", "", "/tmp/codex/resumed.jsonl")
+	resumed := newSource(secondBinding, "resumed-thread", "", "/tmp/kimi/resumed.jsonl")
 	apply(parent, "parent-event", 100, 20, now)
 	apply(child, "child-event", 30, 5, now.Add(time.Second))
 	apply(resumed, "resumed-event", 50, 10, now.Add(2*time.Second))
@@ -1151,8 +1151,8 @@ func TestKimiUsageEventRoundTrip(t *testing.T) {
 func seedUsageSource(t *testing.T, s *sqlite.Store, sess domain.SessionRecord, now time.Time) domain.UsageSourceRecord {
 	t.Helper()
 	initialModelID := "gpt-5"
-	sourceKind := domain.UsageSourceKind("codex_rollout")
-	artifactPath := "/tmp/codex/rollout.jsonl"
+	sourceKind := domain.UsageSourceKind("kimi_wire")
+	artifactPath := "/tmp/kimi/wire.jsonl"
 	binding := mustUpsertUsageBinding(t, s, sess, now, domain.UsageBindingRecord{
 		NativeRootID:   "root-thread",
 		InitialModelID: initialModelID,
@@ -1207,14 +1207,14 @@ func usageEvent(key string, tokens domain.UsageTokenMetrics) domain.ModelUsageEv
 		ModelID:           "gpt-5",
 		MeasurementKind:   domain.UsageMeasurementNativeReported,
 		Tokens:            tokens,
-		ProviderUsageJSON: codexProviderUsage(0, 0),
+		ProviderUsageJSON: kimiProviderUsage(0, 0),
 		SourceEventKey:    key,
 	}
 }
 
-// codexProviderUsage is payload.info reduced to the per-event vector the store
+// kimiProviderUsage is payload.info reduced to the per-event vector the store
 // round-trips and pricing later reads.
-func codexProviderUsage(cacheWrite, reasoning int64) string {
+func kimiProviderUsage(cacheWrite, reasoning int64) string {
 	return fmt.Sprintf(
 		`{"last_token_usage":{"cache_write_input_tokens":%d,"reasoning_output_tokens":%d}}`,
 		cacheWrite, reasoning,

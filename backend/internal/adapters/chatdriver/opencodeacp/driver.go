@@ -44,13 +44,6 @@ func sessionOptions(settings ports.ChatTurnSettings) []acpdriver.SessionOption {
 	if settings.Model != "" {
 		options = append(options, acpdriver.SessionOption{ID: "model", Value: settings.Model})
 	}
-	// OpenCode advertises effort as id "effort" (category "thought_level") with
-	// the model's variant names as values. The model setter resets the variant
-	// to "default" else the first variant when no explicit variant is given,
-	// so the model must be applied first and the effort second.
-	if settings.Effort != "" {
-		options = append(options, acpdriver.SessionOption{ID: "effort", Value: settings.Effort})
-	}
 	if len(options) == 0 {
 		return nil
 	}

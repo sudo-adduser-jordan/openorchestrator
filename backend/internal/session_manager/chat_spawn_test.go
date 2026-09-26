@@ -340,7 +340,7 @@ func TestReconcileLive_StandaloneChatRelaunchesInExistingWorkspace(t *testing.T)
 
 func TestReconcileLive_StandaloneChatFailureRemainsRecoverable(t *testing.T) {
 	t.Parallel()
-	launcher := &recordingLauncher{startErr: fmt.Errorf("read Codex version: exit status 127: %w", ports.ErrChatDriverIncompatible)}
+	launcher := &recordingLauncher{startErr: fmt.Errorf("read OpenCode version: exit status 127: %w", ports.ErrChatDriverIncompatible)}
 	m, st, rt := newChatManager(t, launcher)
 	ws := m.workspace.(*fakeWorkspace)
 	lcm := m.lcm.(*fakeLCM)
@@ -374,7 +374,7 @@ func TestReconcileLive_StandaloneChatFailureRemainsRecoverable(t *testing.T) {
 
 func TestReconcileLive_ChatCompatibilityFailureLeavesNativeResumeRecoverable(t *testing.T) {
 	t.Parallel()
-	launcher := &recordingLauncher{startErr: fmt.Errorf("read Codex version: exit status 127: %w", ports.ErrChatDriverIncompatible)}
+	launcher := &recordingLauncher{startErr: fmt.Errorf("read OpenCode version: exit status 127: %w", ports.ErrChatDriverIncompatible)}
 	m, st, rt := newChatManager(t, launcher)
 	ws := m.workspace.(*fakeWorkspace)
 	lcm := m.lcm.(*fakeLCM)
@@ -461,7 +461,7 @@ func TestReconcileLive_ChatFailureAfterGenerationClaimLeavesSessionExited(t *tes
 
 func TestRestoreTerminatedChatManagerAfterCompatibilityRecoveryKeepsIdentity(t *testing.T) {
 	t.Parallel()
-	launcher := &recordingLauncher{startErr: fmt.Errorf("read Codex version: exit status 127: %w", ports.ErrChatDriverIncompatible)}
+	launcher := &recordingLauncher{startErr: fmt.Errorf("read OpenCode version: exit status 127: %w", ports.ErrChatDriverIncompatible)}
 	m, st, rt := newChatManager(t, launcher)
 	rec := domain.SessionRecord{
 		ID: "mer-176", ProjectID: chatTestProject, Kind: domain.KindManager,

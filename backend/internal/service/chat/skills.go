@@ -17,7 +17,7 @@ var ErrSkillsUnsupported = errors.New("chat driver cannot list skills")
 // Skills reports the named skills the provider will let this session invoke.
 //
 // Read from the live conversation for the same reason models are: skills come from
-// the user's own Codex config and the repo's own files, both of which change
+// the user's own opencode config and the repo's own files, both of which change
 // without Open Agents being told. A list Open Agents cached at build time would offer commands that
 // no longer exist and hide ones the user just wrote.
 func (s *Service) Skills(ctx context.Context, id domain.SessionID) ([]ports.ChatSkill, error) {

@@ -163,7 +163,7 @@ func TestProjectList_Empty(t *testing.T) {
 
 func TestProjectGet_Success(t *testing.T) {
 	cfg := setConfigEnv(t)
-	srv, capture := projectServer(t, http.StatusOK, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo","repo":"git@example.com:demo.git","defaultBranch":"main","agent":"codex"}}`)
+	srv, capture := projectServer(t, http.StatusOK, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo","repo":"git@example.com:demo.git","defaultBranch":"main","agent":"opencode"}}`)
 	writeRunFileFor(t, cfg, srv)
 
 	out, errOut, err := executeCLI(t, Deps{
@@ -270,12 +270,12 @@ func TestProjectSetConfig_RulesFlags(t *testing.T) {
 
 func TestProjectSetConfig_ReviewerJSON(t *testing.T) {
 	cfg := setConfigEnv(t)
-	srv, capture := projectServer(t, http.StatusOK, `{"status":"ok","project":{"id":"demo","config":{"sessionPrefix":"work","reviewers":[{"harness":"codex"}]}}}`)
+	srv, capture := projectServer(t, http.StatusOK, `{"status":"ok","project":{"id":"demo","config":{"sessionPrefix":"work","reviewers":[{"harness":"opencode"}]}}}`)
 	writeRunFileFor(t, cfg, srv)
 
 	_, errOut, err := executeCLI(t, Deps{
 		ProcessAlive: func(int) bool { return true },
-	}, "project", "set-config", "demo", "--config-json", `{"reviewers":[{"harness":"codex"}],"sessionPrefix":"work"}`)
+	}, "project", "set-config", "demo", "--config-json", `{"reviewers":[{"harness":"opencode"}],"sessionPrefix":"work"}`)
 	if err != nil {
 		t.Fatalf("unexpected error: %v\nstderr=%s", err, errOut)
 	}
@@ -283,7 +283,7 @@ func TestProjectSetConfig_ReviewerJSON(t *testing.T) {
 	if err := json.Unmarshal(capture.body, &got); err != nil {
 		t.Fatalf("decode request body: %v\nbody=%s", err, capture.body)
 	}
-	if len(got.Config.Reviewers) != 1 || got.Config.Reviewers[0].Harness != "codex" {
+	if len(got.Config.Reviewers) != 1 || got.Config.Reviewers[0].Harness != "opencode" {
 		t.Fatalf("reviewers config = %#v, want codex reviewer preserved", got.Config.Reviewers)
 	}
 }
@@ -295,7 +295,7 @@ func TestProjectSetConfig_ReviewerFlags(t *testing.T) {
 
 	_, errOut, err := executeCLI(t, Deps{
 		ProcessAlive: func(int) bool { return true },
-	}, "project", "set-config", "demo", "--reviewer", "codex")
+	}, "project", "set-config", "demo", "--reviewer", "opencode")
 	if err != nil {
 		t.Fatalf("unexpected error: %v\nstderr=%s", err, errOut)
 	}
@@ -303,7 +303,7 @@ func TestProjectSetConfig_ReviewerFlags(t *testing.T) {
 	if err := json.Unmarshal(capture.body, &got); err != nil {
 		t.Fatalf("decode request body: %v\nbody=%s", err, capture.body)
 	}
-	if len(got.Config.Reviewers) != 1 || got.Config.Reviewers[0].Harness != "codex" {
+	if len(got.Config.Reviewers) != 1 || got.Config.Reviewers[0].Harness != "opencode" {
 		t.Fatalf("reviewers config = %#v, want single codex reviewer", got.Config.Reviewers)
 	}
 }

@@ -56,7 +56,7 @@ func codexBinary() string {
 	if bin := os.Getenv("OPEN_AGENTS_CODEX_BIN"); bin != "" {
 		return bin
 	}
-	return "codex"
+	return "opencode"
 }
 
 /* ---- the daemon under test --------------------------------------------- */

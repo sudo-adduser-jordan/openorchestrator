@@ -710,10 +710,10 @@ func TestOpenCommandTerminalUsesTrustedProcessConfiguration(t *testing.T) {
 	svc := newTestService(rt, st, &fakeProjectRootLocator{})
 
 	term, err := svc.OpenCommandTerminal(context.Background(), OpenCommandTerminalInput{
-		Argv:       []string{"/Applications/Open Agents.app/Contents/MacOS/open-agents", "codex-login"},
+		Argv:       []string{"/Applications/Open Agents.app/Contents/MacOS/open-agents", "opencode-login"},
 		Env:        map[string]string{"CODEX_HOME": "/data/codex-accounts/work/home"},
 		WorkingDir: "/data/codex-accounts/work/home",
-		Title:      "Codex login - Work",
+		Title:      "OpenCode login - Work",
 	})
 	if err != nil {
 		t.Fatalf("OpenCommandTerminal: %v", err)
@@ -723,7 +723,7 @@ func TestOpenCommandTerminalUsesTrustedProcessConfiguration(t *testing.T) {
 		t.Fatalf("runtime creates = %d, want 1", len(rt.created))
 	}
 	created := rt.created[0]
-	if got, want := created.Argv, []string{"/Applications/Open Agents.app/Contents/MacOS/open-agents", "codex-login"}; !slices.Equal(got, want) {
+	if got, want := created.Argv, []string{"/Applications/Open Agents.app/Contents/MacOS/open-agents", "opencode-login"}; !slices.Equal(got, want) {
 		t.Errorf("argv = %q, want %q", got, want)
 	}
 	if got := created.Env["CODEX_HOME"]; got != "/data/codex-accounts/work/home" {
@@ -735,10 +735,10 @@ func TestOpenCommandTerminalUsesTrustedProcessConfiguration(t *testing.T) {
 	if !created.ExitOnCommandCompletion {
 		t.Error("backend-owned command terminal must exit when its command completes")
 	}
-	if term.Title != "Codex login - Work" || term.WorkingDir != "/data/codex-accounts/work/home" {
+	if term.Title != "OpenCode login - Work" || term.WorkingDir != "/data/codex-accounts/work/home" {
 		t.Errorf("terminal = %+v, want trusted title and working directory", term)
 	}
-	if len(st.records) != 1 || st.records[0].Title != "Codex login - Work" {
+	if len(st.records) != 1 || st.records[0].Title != "OpenCode login - Work" {
 		t.Fatalf("persisted records = %+v, want trusted terminal record", st.records)
 	}
 }
@@ -749,9 +749,9 @@ func TestOpenCommandTerminalDestroysRuntimeWhenPersistenceFails(t *testing.T) {
 	svc := newTestService(rt, st, &fakeProjectRootLocator{})
 
 	_, err := svc.OpenCommandTerminal(context.Background(), OpenCommandTerminalInput{
-		Argv:       []string{"/open-agents", "codex-login"},
+		Argv:       []string{"/open-agents", "opencode-login"},
 		WorkingDir: "/data/codex-accounts/work/home",
-		Title:      "Codex login - Work",
+		Title:      "OpenCode login - Work",
 	})
 	if err == nil {
 		t.Fatal("OpenCommandTerminal error = nil, want persistence failure")

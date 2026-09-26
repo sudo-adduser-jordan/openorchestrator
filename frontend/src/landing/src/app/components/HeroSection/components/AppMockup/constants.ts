@@ -71,7 +71,7 @@ export const PORTS: PortGroup[] = [
 ];
 
 export const AGENT_TABS: AgentTab[] = [
-	{ src: "/app-icons/codex.svg", alt: "Codex", label: "codex", delay: 0.1 },
+	{ src: "/app-icons/opencode.svg", alt: "OpenCode", label: "opencode", delay: 0.1 },
 	{
 		src: "/app-icons/cursor-agent.svg",
 		alt: "Cursor",

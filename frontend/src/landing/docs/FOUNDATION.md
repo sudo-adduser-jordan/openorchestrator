@@ -16,7 +16,7 @@ Most companies think adopting AI is the hard part. It isn't.
 
 The hard part starts once everyone is using it.
 
-One engineer uses OpenCode. Another prefers Codex. Someone else likes
+One engineer uses OpenCode. Another prefers OpenCode. Someone else likes
 Cursor. Every team slowly develops its own way of working. Every few
 months a better agent shows up and the whole organization is expected to
 adapt again. That isn't sustainable.

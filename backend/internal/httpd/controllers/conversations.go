@@ -484,9 +484,8 @@ func (c *ConversationsController) setSettings(w http.ResponseWriter, r *http.Req
 
 	settings, err := c.Svc.SetTurnSettings(r.Context(),
 		domain.SessionID(chi.URLParam(r, "sessionId")), domain.ConversationSettings{
-			Model:           req.Model,
-			ReasoningEffort: req.ReasoningEffort,
-			ApprovalMode:    approval,
+			Model:        req.Model,
+			ApprovalMode: approval,
 		})
 	if err != nil {
 		writeConversationError(w, r, err)
@@ -505,12 +504,10 @@ func conversationModelsResponse(
 	}
 	for _, model := range models {
 		out.Models = append(out.Models, ConversationModelResponse{
-			ID:            model.ID,
-			DisplayName:   model.DisplayName,
-			Description:   model.Description,
-			Default:       model.Default,
-			Efforts:       model.Efforts,
-			DefaultEffort: model.DefaultEffort,
+			ID:          model.ID,
+			DisplayName: model.DisplayName,
+			Description: model.Description,
+			Default:     model.Default,
 		})
 	}
 	return out
@@ -548,9 +545,8 @@ func configOptionsPayload(options []ports.ChatConfigOption) ConversationConfigOp
 
 func turnSettingsPayload(settings domain.ConversationSettings) ConversationTurnSettingsPayload {
 	return ConversationTurnSettingsPayload{
-		Model:           settings.Model,
-		ReasoningEffort: settings.ReasoningEffort,
-		ApprovalMode:    string(settings.ApprovalMode),
+		Model:        settings.Model,
+		ApprovalMode: string(settings.ApprovalMode),
 	}
 }
 
@@ -1191,7 +1187,7 @@ func mcpServersPayload(servers []domain.ConversationMCPServer) []ConversationMCP
 // The two output sources are not equivalent and the client is told which it has.
 // The streamed accumulation exists while the command runs and survives a command
 // that never completes; the provider's own aggregate only appears on completion.
-// Neither is complete -- measured on codex-cli 0.146.0, a command printing
+// Neither is complete -- measured on opencode 0.146.0, a command printing
 // tick-1..tick-8 lost tick-1 from the delta stream and from the aggregate alike --
 // so outputMayBePartial stays set either way. `outputSource` exists so the UI can
 // explain WHY it is partial instead of hedging identically about both.

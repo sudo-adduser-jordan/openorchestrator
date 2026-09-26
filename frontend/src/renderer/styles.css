@@ -1449,7 +1449,7 @@ textarea,
 	height: 100%;
 }
 
-/* Normal-buffer panes (codex, a plain shell) keep scrollback (scrollback:5000 in
+/* Normal-buffer panes (opencode, a plain shell) keep scrollback (scrollback:5000 in
    XtermTerminal). Preserve the existing hidden-scrollbar behavior by default;
    macOS opts into the slim, draggable gutter below. */
 .xterm .xterm-viewport {

@@ -167,7 +167,7 @@ func TestLauncherSpawnPrependsNodeRuntimeForNodeShimReviewer(t *testing.T) {
 	home := t.TempDir()
 	binDir := filepath.Join(home, "reviewer", "bin")
 	nodeDir := filepath.Join(home, ".nvm", "versions", "node", "v24.12.0", "bin")
-	reviewerBin := filepath.Join(binDir, "codex")
+	reviewerBin := filepath.Join(binDir, "opencode")
 	nodeBin := filepath.Join(nodeDir, "node")
 	for _, path := range []string{reviewerBin, nodeBin} {
 		if err := os.MkdirAll(filepath.Dir(path), 0o755); err != nil {
@@ -222,7 +222,7 @@ func TestLauncherSpawnPrependsNodeRuntimeForNodeShimReviewer(t *testing.T) {
 func TestLauncherSpawnKeepsDaemonOpenAgentsAheadOfLaunchBinaryDir(t *testing.T) {
 	home := t.TempDir()
 	binDir := filepath.Join(home, "reviewer", "bin")
-	reviewerBin := filepath.Join(binDir, "codex")
+	reviewerBin := filepath.Join(binDir, "opencode")
 	if err := os.MkdirAll(binDir, 0o755); err != nil {
 		t.Fatal(err)
 	}

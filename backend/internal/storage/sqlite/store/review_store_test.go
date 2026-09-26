@@ -98,7 +98,7 @@ func TestInsertReviewRunAllowsADifferentHarnessForTheSameCommit(t *testing.T) {
 	// Only opencode is a supported reviewer, but the idempotency key is a
 	// generic (session, pr, sha, harness) tuple, so a second pass recorded
 	// under any other harness string remains a distinct run.
-	other.Harness = domain.ReviewerHarness("codex")
+	other.Harness = domain.ReviewerHarness("opencode")
 	if err := s.InsertReviewRun(ctx, other); err != nil {
 		t.Fatalf("a different harness on the same commit should insert: %v", err)
 	}

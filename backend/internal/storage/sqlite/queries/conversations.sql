@@ -352,14 +352,14 @@ WHERE id = ?;
 -- offset, so a multi-byte character here silently corrupts later queries.
 -- name: UpdateConversationTurnSettings :exec
 UPDATE conversations
-SET model = ?, reasoning_effort = ?, approval_mode = ?, opencode_mode = ?, updated_at = ?
+SET model = ?, approval_mode = ?, opencode_mode = ?, updated_at = ?
 WHERE id = ?;
 
 -- An agent switch starts a new provider/model scope. Clear only the source
 -- harness choices; approval posture is Open Agents-owned and remains applicable.
 -- name: ResetConversationAgentOverridesForSession :exec
 UPDATE conversations
-SET model = NULL, reasoning_effort = NULL, updated_at = ?
+SET model = NULL, updated_at = ?
 WHERE current_session_id = ?;
 
 -- Token position for the conversation, latest wins.

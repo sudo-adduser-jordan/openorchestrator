@@ -10,7 +10,7 @@ Automatic resolution uses the selected remote's live symbolic `HEAD`, with its c
 Open Agents records the resolved base ref for every repository in the session. Workspace and review diffs can therefore recompute their merge base after a rebase or after the repository default advances, without treating upstream-only changes as agent edits.
 
 ```bash
-open-agents project add --path /path/to/repo --worker-agent codex
+open-agents project add --path /path/to/repo --worker-agent opencode
 open-agents spawn --project my-repo --name fix-auth
 ```
 

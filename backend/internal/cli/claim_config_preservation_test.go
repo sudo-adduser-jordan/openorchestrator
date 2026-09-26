@@ -8,7 +8,7 @@ import (
 
 func TestCanonicalConfigPreservesExistingSettings(t *testing.T) {
 	cfg := setConfigEnv(t)
-	srv, capture := projectServer(t, http.StatusOK, `{"status":"ok","project":{"id":"demo","config":{"containerReap":{"disabled":true},"reviewers":[{"harness":"codex","agentConfig":{"model":"gpt-5","mode":"high"}}],"env":{"KEEP":"value"}}}}`)
+	srv, capture := projectServer(t, http.StatusOK, `{"status":"ok","project":{"id":"demo","config":{"containerReap":{"disabled":true},"reviewers":[{"harness":"opencode","agentConfig":{"model":"gpt-5","mode":"high"}}],"env":{"KEEP":"value"}}}}`)
 	writeRunFileFor(t, cfg, srv)
 	deps := Deps{ProcessAlive: func(int) bool { return true }}
 	out, _, err := executeCLI(t, deps, "project", "get", "demo", "--json")

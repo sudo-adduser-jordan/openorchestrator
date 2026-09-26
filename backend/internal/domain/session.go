@@ -138,7 +138,7 @@ type SessionMetadata struct {
 	// active native agent session when its provider exposes one.
 	NativeTranscriptPath string `json:"nativeTranscriptPath,omitempty"`
 	// ProviderConversationID is the opaque handle a Chat driver needs to resume
-	// this session's provider conversation after a restart (a Codex thread id
+	// this session's provider conversation after a restart (a opencode thread id
 	// today). Normally empty for TUI sessions. It remains a distinct field from
 	// AgentSessionID because most harnesses do not prove those protocol identities
 	// interchangeable; the interface-transition coordinator copies one value into

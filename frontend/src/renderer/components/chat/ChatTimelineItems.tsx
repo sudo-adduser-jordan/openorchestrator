@@ -1968,7 +1968,7 @@ function RerouteRow({ activity }: { activity: ConversationActivity }) {
 /**
  * A provider error item — reconnect storms, credit exhaustion, and similar.
  *
- * Codex (and peers) often put the whole JSON envelope in `message` / `summary`.
+ * Some providers often put the whole JSON envelope in `message` / `summary`.
  * Rendering that as a generic activity label made one long unbreakable line that
  * widened the chat column under the sidebars, and five reconnect attempts painted
  * five walls of red JSON. This row unwraps the human parts and always wraps inside
@@ -2216,7 +2216,7 @@ export function SteerMessage({
  * A decision the agent is blocked on.
  *
  * Decisions come from `activity.decisions` — the provider's own list — never from
- * a fixed set. The UI still presents common permission choices with Open Agents/Codex copy
+ * a fixed set. The UI still presents common permission choices with Open Agents/opencode copy
  * so provider-flavored labels do not leak into the chat surface.
  */
 export function ApprovalCard({

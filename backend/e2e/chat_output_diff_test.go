@@ -86,7 +86,7 @@ func TestChatCommandOutputIsRecordedAndLabelled(t *testing.T) {
 
 // Output while the command is STILL RUNNING is the whole reason to accumulate deltas
 // rather than wait for the aggregate. A command that prints slowly is the only case
-// where the provider streams at all: measured on codex-cli 0.146.0, a fast command
+// where the provider streams at all: measured on opencode 0.146.0, a fast command
 // finishes before a single delta is flushed and produces only the aggregate.
 func TestChatSlowCommandOutputAppearsBeforeItFinishes(t *testing.T) {
 	requireE2E(t)

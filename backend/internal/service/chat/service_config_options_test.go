@@ -18,8 +18,8 @@ func TestSettingsFromConfigOptionsKeepsAgentModelAndEffortAcrossRestart(t *testi
 	if !changed {
 		t.Fatal("settings should change")
 	}
-	if settings.Model != "gpt-5.4" || settings.ReasoningEffort != "high" || settings.ApprovalMode != domain.PermissionModeBypassPermissions {
-		t.Fatalf("settings = %+v, want model and effort while preserving approval", settings)
+	if settings.Model != "gpt-5.4" || settings.ApprovalMode != domain.PermissionModeBypassPermissions {
+		t.Fatalf("settings = %+v, want model while preserving approval", settings)
 	}
 }
 

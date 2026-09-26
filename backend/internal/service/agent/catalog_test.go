@@ -336,10 +336,10 @@ func TestListReturnsInitialSupportedInventoryWithoutProbing(t *testing.T) {
 	probed := false
 	svc := NewWithAgents([]agentregistry.HarnessAgent{
 		{
-			Harness: domain.AgentHarness("codex"),
+			Harness: domain.AgentHarness("opencode"),
 			Manifest: adapters.Manifest{
-				ID:   "codex",
-				Name: "Codex",
+				ID:   "opencode",
+				Name: "OpenCode",
 			},
 			Agent: probeTrackingAgent{onProbe: func() { probed = true }},
 		},
@@ -352,8 +352,8 @@ func TestListReturnsInitialSupportedInventoryWithoutProbing(t *testing.T) {
 	if probed {
 		t.Fatal("List ran a live probe")
 	}
-	if len(got.Supported) != 1 || got.Supported[0].ID != "codex" {
-		t.Fatalf("supported = %#v, want codex", got.Supported)
+	if len(got.Supported) != 1 || got.Supported[0].ID != "opencode" {
+		t.Fatalf("supported = %#v, want opencode", got.Supported)
 	}
 	if len(got.Installed) != 0 || len(got.Authorized) != 0 {
 		t.Fatalf("inventory = %#v, want only supported entries before refresh", got)
@@ -369,22 +369,22 @@ func TestListReturnsInitialSupportedInventoryWithoutProbing(t *testing.T) {
 func TestFindInstalledBinary_ResolvesWithoutRefreshingInventory(t *testing.T) {
 	svc := NewWithAgents([]agentregistry.HarnessAgent{
 		harnessAgent("missing", "Missing", ports.ErrAgentBinaryNotFound),
-		harnessAgent("codex", "Codex", nil),
+		harnessAgent("opencode", "OpenCode", nil),
 	})
 
 	got, ok := svc.FindInstalledBinary(context.Background())
 	if !ok {
-		t.Fatal("FindInstalledBinary() found no binary, want Codex")
+		t.Fatal("FindInstalledBinary() found no binary, want OpenCode")
 	}
-	if got.ID != "codex" || got.Label != "Codex" {
-		t.Fatalf("FindInstalledBinary() = %#v, want Codex", got)
+	if got.ID != "opencode" || got.Label != "OpenCode" {
+		t.Fatalf("FindInstalledBinary() = %#v, want OpenCode", got)
 	}
 
 	inventory, err := svc.List(context.Background())
 	if err != nil {
 		t.Fatalf("List() error = %v", err)
 	}
-	if len(inventory.Installed) != 1 || inventory.Installed[0].ID != "codex" || len(inventory.Authorized) != 0 {
+	if len(inventory.Installed) != 1 || inventory.Installed[0].ID != "opencode" || len(inventory.Authorized) != 0 {
 		t.Fatalf("inventory = %#v, want coordinator installation snapshot without auth", inventory)
 	}
 }
@@ -550,7 +550,7 @@ func TestDefaultCatalogDisplaysOpenCode(t *testing.T) {
 
 func TestRefreshReportsInstalledAgentsAndIgnoresDetectorErrors(t *testing.T) {
 	svc := NewWithAgents([]agentregistry.HarnessAgent{
-		harnessAgent("codex", "Codex", nil),
+		harnessAgent("opencode", "OpenCode", nil),
 		harnessAgent("missing", "Missing", ports.ErrAgentBinaryNotFound),
 		harnessAgent("broken", "Broken", errors.New("unexpected detector failure")),
 	})
@@ -562,17 +562,17 @@ func TestRefreshReportsInstalledAgentsAndIgnoresDetectorErrors(t *testing.T) {
 	if len(got.Supported) != 3 {
 		t.Fatalf("supported = %#v, want 3 agents", got.Supported)
 	}
-	if len(got.Installed) != 1 || got.Installed[0].ID != "codex" {
-		t.Fatalf("installed = %#v, want only codex", got.Installed)
+	if len(got.Installed) != 1 || got.Installed[0].ID != "opencode" {
+		t.Fatalf("installed = %#v, want only opencode", got.Installed)
 	}
 }
 
 func TestRefreshReportsAuthorizedInstalledAgents(t *testing.T) {
 	svc := NewWithAgents([]agentregistry.HarnessAgent{
-		harnessAuthAgent("codex", "Codex", ports.AgentAuthStatusAuthorized, nil),
+		harnessAuthAgent("opencode", "OpenCode", ports.AgentAuthStatusAuthorized, nil),
 		harnessAuthAgent("goose", "Goose", ports.AgentAuthStatusUnauthorized, nil),
-		harnessAgent("opencode", "OpenCode", nil),
-		harnessAuthAgent("broken-auth", "Broken Auth", ports.AgentAuthStatusAuthorized, errors.New("probe failed")),
+		harnessAgent("broken-auth", "Broken Auth", nil),
+		harnessAuthAgent("droid", "Droid", ports.AgentAuthStatusAuthorized, errors.New("probe failed")),
 	})
 
 	got, err := svc.Refresh(context.Background())
@@ -582,31 +582,31 @@ func TestRefreshReportsAuthorizedInstalledAgents(t *testing.T) {
 	if len(got.Supported) != 4 || len(got.Installed) != 4 {
 		t.Fatalf("inventory = %#v, want supported=4 installed=4", got)
 	}
-	if len(got.Authorized) != 1 || got.Authorized[0].ID != "codex" {
-		t.Fatalf("authorized = %#v, want only codex", got.Authorized)
+	if len(got.Authorized) != 1 || got.Authorized[0].ID != "opencode" {
+		t.Fatalf("authorized = %#v, want only opencode", got.Authorized)
 	}
 
 	byID := map[string]Info{}
 	for _, info := range got.Installed {
 		byID[info.ID] = info
 	}
-	if byID["codex"].AuthStatus != ports.AgentAuthStatusAuthorized {
-		t.Fatalf("codex authStatus = %q", byID["codex"].AuthStatus)
+	if byID["opencode"].AuthStatus != ports.AgentAuthStatusAuthorized {
+		t.Fatalf("opencode authStatus = %q", byID["opencode"].AuthStatus)
 	}
 	if byID["goose"].AuthStatus != ports.AgentAuthStatusUnauthorized {
 		t.Fatalf("goose authStatus = %q", byID["goose"].AuthStatus)
 	}
-	if byID["opencode"].AuthStatus != ports.AgentAuthStatusUnknown {
-		t.Fatalf("opencode authStatus = %q", byID["opencode"].AuthStatus)
-	}
 	if byID["broken-auth"].AuthStatus != ports.AgentAuthStatusUnknown {
 		t.Fatalf("broken-auth authStatus = %q", byID["broken-auth"].AuthStatus)
+	}
+	if byID["droid"].AuthStatus != ports.AgentAuthStatusUnknown {
+		t.Fatalf("droid authStatus = %q", byID["droid"].AuthStatus)
 	}
 }
 
 func TestRefreshDoesNotWaitForSlowAgentProbe(t *testing.T) {
 	svc := NewWithAgents([]agentregistry.HarnessAgent{
-		harnessAgent("codex", "Codex", nil),
+		harnessAgent("opencode", "OpenCode", nil),
 		{
 			Harness: domain.AgentHarness("slow"),
 			Manifest: adapters.Manifest{
@@ -629,8 +629,8 @@ func TestRefreshDoesNotWaitForSlowAgentProbe(t *testing.T) {
 	if len(got.Supported) != 2 {
 		t.Fatalf("supported = %#v, want both agents", got.Supported)
 	}
-	if len(got.Installed) != 1 || got.Installed[0].ID != "codex" {
-		t.Fatalf("installed = %#v, want only codex", got.Installed)
+	if len(got.Installed) != 1 || got.Installed[0].ID != "opencode" {
+		t.Fatalf("installed = %#v, want only opencode", got.Installed)
 	}
 }
 
@@ -639,24 +639,24 @@ func TestListRanksAgentsByRetainedSessionUsage(t *testing.T) {
 	newer := older.Add(24 * time.Hour)
 	svc := NewWithAgents([]agentregistry.HarnessAgent{
 		harnessAgent("droid", "Droid", nil),
-		harnessAgent("codex", "Codex", nil),
+		harnessAgent("opencode", "OpenCode", nil),
 		harnessAgent("goose", "Goose", nil),
 	})
 	svc.sessions = fakeSessionUsageLookup{records: []domain.SessionRecord{
 		{Harness: domain.AgentHarness("droid"), CreatedAt: newer},
-		{Harness: domain.AgentHarness("codex"), CreatedAt: older},
-		{Harness: domain.AgentHarness("codex"), CreatedAt: newer},
+		{Harness: domain.AgentHarness("opencode"), CreatedAt: older},
+		{Harness: domain.AgentHarness("opencode"), CreatedAt: newer},
 	}}
 
 	got, err := svc.List(context.Background())
 	if err != nil {
 		t.Fatalf("List: %v", err)
 	}
-	if ids := []string{got.Supported[0].ID, got.Supported[1].ID, got.Supported[2].ID}; !reflect.DeepEqual(ids, []string{"codex", "droid", "goose"}) {
+	if ids := []string{got.Supported[0].ID, got.Supported[1].ID, got.Supported[2].ID}; !reflect.DeepEqual(ids, []string{"opencode", "droid", "goose"}) {
 		t.Fatalf("supported order = %v, want frequency then unused fallback", ids)
 	}
 	if got.Supported[0].UsageCount != 2 || got.Supported[0].LastUsedAt == nil || !got.Supported[0].LastUsedAt.Equal(newer) {
-		t.Fatalf("codex usage = %#v, want count 2 and latest use %s", got.Supported[0], newer)
+		t.Fatalf("opencode usage = %#v, want count 2 and latest use %s", got.Supported[0], newer)
 	}
 	if got.Supported[2].UsageCount != 0 || got.Supported[2].LastUsedAt != nil {
 		t.Fatalf("unused agent usage = %#v, want empty usage metadata", got.Supported[2])
@@ -664,7 +664,7 @@ func TestListRanksAgentsByRetainedSessionUsage(t *testing.T) {
 }
 
 func TestListReturnsSessionUsageReadFailure(t *testing.T) {
-	svc := NewWithAgents([]agentregistry.HarnessAgent{harnessAgent("codex", "Codex", nil)})
+	svc := NewWithAgents([]agentregistry.HarnessAgent{harnessAgent("opencode", "OpenCode", nil)})
 	svc.sessions = fakeSessionUsageLookup{err: errors.New("database unavailable")}
 
 	_, err := svc.List(context.Background())
@@ -676,10 +676,10 @@ func TestListReturnsSessionUsageReadFailure(t *testing.T) {
 func TestRefreshUsesSeparateTimeoutForAuthProbe(t *testing.T) {
 	svc := NewWithAgents([]agentregistry.HarnessAgent{
 		{
-			Harness: domain.AgentHarness("codex"),
+			Harness: domain.AgentHarness("opencode"),
 			Manifest: adapters.Manifest{
-				ID:   "codex",
-				Name: "Codex",
+				ID:   "opencode",
+				Name: "OpenCode",
 			},
 			Agent: fakeAuthAgent{
 				fakeAgent: fakeAgent{},
@@ -695,8 +695,8 @@ func TestRefreshUsesSeparateTimeoutForAuthProbe(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Refresh: %v", err)
 	}
-	if len(got.Authorized) != 1 || got.Authorized[0].ID != "codex" {
-		t.Fatalf("authorized = %#v, want codex", got.Authorized)
+	if len(got.Authorized) != 1 || got.Authorized[0].ID != "opencode" {
+		t.Fatalf("authorized = %#v, want opencode", got.Authorized)
 	}
 }
 
@@ -704,10 +704,10 @@ func TestRefreshForcesFreshReadinessChecks(t *testing.T) {
 	probes := 0
 	svc := NewWithAgents([]agentregistry.HarnessAgent{
 		{
-			Harness: domain.AgentHarness("codex"),
+			Harness: domain.AgentHarness("opencode"),
 			Manifest: adapters.Manifest{
-				ID:   "codex",
-				Name: "Codex",
+				ID:   "opencode",
+				Name: "OpenCode",
 			},
 			Agent: probeTrackingAgent{onProbe: func() { probes++ }},
 		},
@@ -727,10 +727,10 @@ func TestRefreshForcesFreshReadinessChecks(t *testing.T) {
 func TestRefreshFreshDetectsManualInstallWithoutInvalidation(t *testing.T) {
 	agent := &mutableInstallAgent{}
 	svc := NewWithAgents([]agentregistry.HarnessAgent{{
-		Harness: domain.AgentHarness("codex"),
+		Harness: domain.AgentHarness("opencode"),
 		Manifest: adapters.Manifest{
-			ID:   "codex",
-			Name: "Codex",
+			ID:   "opencode",
+			Name: "OpenCode",
 		},
 		Agent: agent,
 	}})
@@ -748,8 +748,8 @@ func TestRefreshFreshDetectsManualInstallWithoutInvalidation(t *testing.T) {
 	if err != nil {
 		t.Fatalf("RefreshFresh: %v", err)
 	}
-	if len(fresh.Installed) != 1 || fresh.Installed[0].ID != "codex" {
-		t.Fatalf("fresh Installed = %#v, want codex", fresh.Installed)
+	if len(fresh.Installed) != 1 || fresh.Installed[0].ID != "opencode" {
+		t.Fatalf("fresh Installed = %#v, want opencode", fresh.Installed)
 	}
 }
 
@@ -757,10 +757,10 @@ func TestProbeBypassesRefreshRateLimitForOneAgent(t *testing.T) {
 	probes := 0
 	svc := NewWithAgents([]agentregistry.HarnessAgent{
 		{
-			Harness: domain.AgentHarness("codex"),
+			Harness: domain.AgentHarness("opencode"),
 			Manifest: adapters.Manifest{
-				ID:   "codex",
-				Name: "Codex",
+				ID:   "opencode",
+				Name: "OpenCode",
 			},
 			Agent: probeTrackingAgent{fakeAgent: fakeAgent{}, onProbe: func() { probes++ }},
 		},
@@ -770,12 +770,12 @@ func TestProbeBypassesRefreshRateLimitForOneAgent(t *testing.T) {
 	if _, err := svc.Refresh(context.Background()); err != nil {
 		t.Fatalf("Refresh: %v", err)
 	}
-	got, err := svc.Probe(context.Background(), "codex")
+	got, err := svc.Probe(context.Background(), "opencode")
 	if err != nil {
 		t.Fatalf("Probe: %v", err)
 	}
-	if !got.Supported || !got.Installed || got.Agent.ID != "codex" {
-		t.Fatalf("Probe = %#v, want supported installed codex", got)
+	if !got.Supported || !got.Installed || got.Agent.ID != "opencode" {
+		t.Fatalf("Probe = %#v, want supported installed opencode", got)
 	}
 	if probes != 1 {
 		t.Fatalf("probes = %d, want launch probe to reuse a launch-fresh snapshot", probes)
@@ -784,8 +784,8 @@ func TestProbeBypassesRefreshRateLimitForOneAgent(t *testing.T) {
 	if err != nil {
 		t.Fatalf("List after Probe: %v", err)
 	}
-	if len(listed.Installed) != 1 || listed.Installed[0].ID != "codex" {
-		t.Fatalf("installed after Probe = %#v, want codex", listed.Installed)
+	if len(listed.Installed) != 1 || listed.Installed[0].ID != "opencode" {
+		t.Fatalf("installed after Probe = %#v, want opencode", listed.Installed)
 	}
 }
 
@@ -793,12 +793,12 @@ func TestProbeRechecksCachedUnauthorizedAuthentication(t *testing.T) {
 	status := ports.AgentAuthStatusUnauthorized
 	agent := &mutableAuthAgent{status: &status}
 	svc := NewWithAgents([]agentregistry.HarnessAgent{{
-		Harness:  domain.AgentHarness("codex"),
-		Manifest: adapters.Manifest{ID: "codex", Name: "Codex"},
+		Harness:  domain.AgentHarness("opencode"),
+		Manifest: adapters.Manifest{ID: "opencode", Name: "OpenCode"},
 		Agent:    agent,
 	}})
 
-	initial, err := svc.EnsureAgentReadiness(context.Background(), "codex", domain.AgentReadinessPurposeLaunch)
+	initial, err := svc.EnsureAgentReadiness(context.Background(), "opencode", domain.AgentReadinessPurposeLaunch)
 	if err != nil {
 		t.Fatalf("EnsureAgentReadiness: %v", err)
 	}
@@ -807,7 +807,7 @@ func TestProbeRechecksCachedUnauthorizedAuthentication(t *testing.T) {
 	}
 
 	status = ports.AgentAuthStatusAuthorized
-	got, err := svc.Probe(context.Background(), "codex")
+	got, err := svc.Probe(context.Background(), "opencode")
 	if err != nil {
 		t.Fatalf("Probe: %v", err)
 	}
@@ -844,10 +844,10 @@ func TestProbeReportsUnsupportedAndMissingAgent(t *testing.T) {
 func TestModelsCachesDiscoveredCatalogByProject(t *testing.T) {
 	cache := &fakeModelCache{}
 	svc := newService([]agentregistry.HarnessAgent{
-		harnessAgent("codex", "Codex", nil),
+		harnessAgent("opencode", "OpenCode", nil),
 	}, cache, nil, successfulModelDiscoverer())
 
-	first, err := svc.Models(context.Background(), "codex", "proj-1", false)
+	first, err := svc.Models(context.Background(), "opencode", "proj-1", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -858,7 +858,7 @@ func TestModelsCachesDiscoveredCatalogByProject(t *testing.T) {
 		t.Fatalf("cache puts = %d, want 1", cache.puts)
 	}
 
-	second, err := svc.Models(context.Background(), "codex", "proj-1", false)
+	second, err := svc.Models(context.Background(), "opencode", "proj-1", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -880,16 +880,16 @@ func TestModelsReusesCacheWhileBinaryVersionMatches(t *testing.T) {
 		Source:        "cli",
 	}}
 	svc := newService([]agentregistry.HarnessAgent{{
-		Harness:  domain.AgentHarness("codex"),
-		Manifest: adapters.Manifest{ID: "codex", Name: "Codex"},
+		Harness:  domain.AgentHarness("opencode"),
+		Manifest: adapters.Manifest{ID: "opencode", Name: "OpenCode"},
 		Agent:    agent,
 	}}, cache, nil, discoverer)
 
-	_, err := svc.Models(context.Background(), "codex", "proj-1", false)
+	_, err := svc.Models(context.Background(), "opencode", "proj-1", false)
 	if err != nil {
 		t.Fatal(err)
 	}
-	record := cache.records["codex\x00proj-1"]
+	record := cache.records["opencode\x00proj-1"]
 	var old ports.AgentModelCatalog
 	if err := json.Unmarshal([]byte(record.CatalogJSON), &old); err != nil {
 		t.Fatal(err)
@@ -900,10 +900,10 @@ func TestModelsReusesCacheWhileBinaryVersionMatches(t *testing.T) {
 		t.Fatal(err)
 	}
 	record.CatalogJSON = string(data)
-	cache.records["codex\x00proj-1"] = record
+	cache.records["opencode\x00proj-1"] = record
 
 	resolveCalls := agent.calls.Load()
-	cached, err := svc.Models(context.Background(), "codex", "proj-1", false)
+	cached, err := svc.Models(context.Background(), "opencode", "proj-1", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -927,19 +927,19 @@ func TestModelsRediscoversWhenBinaryVersionChanges(t *testing.T) {
 		Source:        "cli",
 	}}
 	svc := newService([]agentregistry.HarnessAgent{{
-		Harness:  domain.AgentHarness("codex"),
-		Manifest: adapters.Manifest{ID: "codex", Name: "Codex"},
+		Harness:  domain.AgentHarness("opencode"),
+		Manifest: adapters.Manifest{ID: "opencode", Name: "OpenCode"},
 		Agent:    &countingResolverAgent{},
 	}}, cache, nil, discoverer)
 
-	first, err := svc.Models(context.Background(), "codex", "proj-1", false)
+	first, err := svc.Models(context.Background(), "opencode", "proj-1", false)
 	if err != nil {
 		t.Fatal(err)
 	}
 	discoverer.version = "v2"
 	discoverer.catalog.Models = []ports.AgentModelInfo{{ID: "model-two"}}
 	discoverer.catalog.FetchedAt = time.Time{}
-	got, err := svc.Models(context.Background(), "codex", "proj-1", false)
+	got, err := svc.Models(context.Background(), "opencode", "proj-1", false)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -992,10 +992,10 @@ func TestModelsResolvesProjectWorkingDirectory(t *testing.T) {
 		"proj-1": {ID: "proj-1", Path: "/work/project"},
 	}}
 	svc := newService([]agentregistry.HarnessAgent{
-		harnessAgent("codex", "Codex", nil),
+		harnessAgent("opencode", "OpenCode", nil),
 	}, nil, projects, testModelDiscoverer)
 
-	if _, err := svc.Models(context.Background(), "codex", "proj-1", false); err != nil {
+	if _, err := svc.Models(context.Background(), "opencode", "proj-1", false); err != nil {
 		t.Fatal(err)
 	}
 	if projects.gotID != "proj-1" {
@@ -1034,10 +1034,10 @@ func TestModelsPassesProjectEnvironmentToDiscovery(t *testing.T) {
 
 func TestModelsRejectsUnknownProjectScope(t *testing.T) {
 	svc := newService([]agentregistry.HarnessAgent{
-		harnessAgent("codex", "Codex", nil),
+		harnessAgent("opencode", "OpenCode", nil),
 	}, nil, &fakeProjectLookup{records: map[string]domain.ProjectRecord{}}, testModelDiscoverer)
 
-	if _, err := svc.Models(context.Background(), "codex", "missing", false); err == nil {
+	if _, err := svc.Models(context.Background(), "opencode", "missing", false); err == nil {
 		t.Fatal("Models: want unknown-project error")
 	}
 }
@@ -1081,7 +1081,7 @@ func TestModelsNormalizesCustomEntryPolicyInOldCache(t *testing.T) {
 		wantEntryMode  ports.CustomModelEntryMode
 		wantAllowInput bool
 	}{
-		{agent: "codex", wantEntryMode: ports.CustomModelEntryDirect, wantAllowInput: true},
+		{agent: "opencode", wantEntryMode: ports.CustomModelEntryDirect, wantAllowInput: true},
 		{agent: "opencode", wantEntryMode: ports.CustomModelEntryDirect, wantAllowInput: true},
 		{agent: "grok", wantEntryMode: ports.CustomModelEntryDirect, wantAllowInput: true},
 	} {
@@ -1113,8 +1113,8 @@ func TestModelsNormalizesCustomEntryPolicyInOldCache(t *testing.T) {
 func TestModelsSerializeBinaryResolutionPerAdapter(t *testing.T) {
 	agent := &concurrentResolverAgent{}
 	svc := newService([]agentregistry.HarnessAgent{{
-		Harness:  domain.AgentHarness("codex"),
-		Manifest: adapters.Manifest{ID: "codex", Name: "Codex"},
+		Harness:  domain.AgentHarness("opencode"),
+		Manifest: adapters.Manifest{ID: "opencode", Name: "OpenCode"},
 		Agent:    agent,
 	}}, nil, nil, testModelDiscoverer)
 
@@ -1126,7 +1126,7 @@ func TestModelsSerializeBinaryResolutionPerAdapter(t *testing.T) {
 		go func() {
 			defer wg.Done()
 			<-start
-			_, err := svc.Models(context.Background(), "codex", "", true)
+			_, err := svc.Models(context.Background(), "opencode", "", true)
 			errs <- err
 		}()
 	}
@@ -1149,10 +1149,10 @@ func TestModelsSerializeBinaryResolutionPerAdapter(t *testing.T) {
 func TestModelsReturnsDiscoveredCatalogWhenCacheWriteFails(t *testing.T) {
 	cache := &fakeModelCache{putErr: errors.New("database unavailable")}
 	svc := newService([]agentregistry.HarnessAgent{
-		harnessAgent("codex", "Codex", nil),
+		harnessAgent("opencode", "OpenCode", nil),
 	}, cache, nil, successfulModelDiscoverer())
 
-	got, err := svc.Models(context.Background(), "codex", "", true)
+	got, err := svc.Models(context.Background(), "opencode", "", true)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1278,14 +1278,14 @@ func harnessAuthAgent(id, label string, status ports.AgentAuthStatus, err error)
 func TestResolveAgentBinaryUsesRequestedAdapter(t *testing.T) {
 	t.Parallel()
 
-	svc := NewWithAgents([]agentregistry.HarnessAgent{harnessAgent("codex", "Codex", nil)})
+	svc := NewWithAgents([]agentregistry.HarnessAgent{harnessAgent("opencode", "OpenCode", nil)})
 
-	path, err := svc.ResolveAgentBinary(context.Background(), "codex")
+	path, err := svc.ResolveAgentBinary(context.Background(), "opencode")
 	if err != nil {
-		t.Fatalf("ResolveAgentBinary(codex): %v", err)
+		t.Fatalf("ResolveAgentBinary(opencode): %v", err)
 	}
 	if path != "agent" {
-		t.Fatalf("ResolveAgentBinary(codex) = %q, want adapter-resolved path", path)
+		t.Fatalf("ResolveAgentBinary(opencode) = %q, want adapter-resolved path", path)
 	}
 }
 
@@ -1303,10 +1303,10 @@ func TestModelsFingerprintsTheSameInputsDiscoveryReads(t *testing.T) {
 		Source:        "official-aliases",
 	}}
 	svc := newService([]agentregistry.HarnessAgent{
-		harnessAgent("codex", "Codex", nil),
+		harnessAgent("opencode", "OpenCode", nil),
 	}, &fakeModelCache{}, projects, discoverer)
 
-	if _, err := svc.Models(context.Background(), "codex", "proj-1", false); err != nil {
+	if _, err := svc.Models(context.Background(), "opencode", "proj-1", false); err != nil {
 		t.Fatal(err)
 	}
 	// The cache decision runs before discovery, so it must be able to see the

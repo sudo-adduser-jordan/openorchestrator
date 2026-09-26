@@ -54,7 +54,7 @@ func TestSpawnCommand_MissingProjectContext(t *testing.T) {
 	t.Cleanup(srv.Close)
 	writeRunFileFor(t, cfg, srv)
 
-	_, _, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--agent", "codex", "--name", "worker")
+	_, _, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--agent", "opencode", "--name", "worker")
 	if err == nil {
 		t.Fatal("expected an error when project context is missing")
 	}
@@ -91,7 +91,7 @@ func TestSpawnClaimPRWiring(t *testing.T) {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/demo":
 			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo","repo":"https://github.com/sudo-adduser-jordan/open-agents","defaultBranch":"main"}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-			_, _ = io.WriteString(w, authorizedAgentsJSON("codex"))
+			_, _ = io.WriteString(w, authorizedAgentsJSON("opencode"))
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 			_, _ = io.WriteString(w, `{"session":{"id":"demo-9","status":"idle"}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions/demo-9/pr/claim":
@@ -108,7 +108,7 @@ func TestSpawnClaimPRWiring(t *testing.T) {
 	t.Cleanup(srv.Close)
 	writeRunFileFor(t, cfg, srv)
 
-	out, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "codex", "--name", "worker", "--claim-pr", "142", "--no-takeover")
+	out, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "opencode", "--name", "worker", "--claim-pr", "142", "--no-takeover")
 	if err != nil {
 		t.Fatalf("spawn claim-pr failed: %v stderr=%s", err, errOut)
 	}
@@ -133,7 +133,7 @@ func TestSpawnClaimPR_Draft(t *testing.T) {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/demo":
 			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo","repo":"https://github.com/sudo-adduser-jordan/open-agents","defaultBranch":"main"}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-			_, _ = io.WriteString(w, authorizedAgentsJSON("codex"))
+			_, _ = io.WriteString(w, authorizedAgentsJSON("opencode"))
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 			_, _ = io.WriteString(w, `{"session":{"id":"demo-9","status":"idle"}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions/demo-9/pr/claim":
@@ -150,7 +150,7 @@ func TestSpawnClaimPR_Draft(t *testing.T) {
 	t.Cleanup(srv.Close)
 	writeRunFileFor(t, cfg, srv)
 
-	out, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "codex", "--name", "worker", "--claim-pr", "4168")
+	out, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "opencode", "--name", "worker", "--claim-pr", "4168")
 	if err != nil {
 		t.Fatalf("spawn claim-pr draft failed: %v stderr=%s", err, errOut)
 	}
@@ -175,7 +175,7 @@ func TestSpawnClaimPR_GitLab(t *testing.T) {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/demo":
 			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo","repo":"https://gitlab.com/castai/ctxd","defaultBranch":"main"}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-			_, _ = io.WriteString(w, authorizedAgentsJSON("codex"))
+			_, _ = io.WriteString(w, authorizedAgentsJSON("opencode"))
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 			_, _ = io.WriteString(w, `{"session":{"id":"demo-9","status":"idle"}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions/demo-9/pr/claim":
@@ -191,7 +191,7 @@ func TestSpawnClaimPR_GitLab(t *testing.T) {
 	t.Cleanup(srv.Close)
 	writeRunFileFor(t, cfg, srv)
 
-	out, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "codex", "--name", "worker", "--claim-pr", "https://gitlab.com/castai/ctxd/-/merge_requests/9", "--no-takeover")
+	out, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "opencode", "--name", "worker", "--claim-pr", "https://gitlab.com/castai/ctxd/-/merge_requests/9", "--no-takeover")
 	if err != nil {
 		t.Fatalf("spawn claim-pr gitlab failed: %v stderr=%s", err, errOut)
 	}
@@ -215,7 +215,7 @@ func TestSpawnClaimPRFailureRollsBackSession(t *testing.T) {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/demo":
 			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo","repo":"https://github.com/sudo-adduser-jordan/open-agents","defaultBranch":"main"}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-			_, _ = io.WriteString(w, authorizedAgentsJSON("codex"))
+			_, _ = io.WriteString(w, authorizedAgentsJSON("opencode"))
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 			sessions["demo-10"] = true
 			_, _ = io.WriteString(w, `{"session":{"id":"demo-10","status":"idle"}}`)
@@ -235,7 +235,7 @@ func TestSpawnClaimPRFailureRollsBackSession(t *testing.T) {
 	t.Cleanup(srv.Close)
 	writeRunFileFor(t, cfg, srv)
 
-	_, _, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "codex", "--name", "worker", "--claim-pr", "142")
+	_, _, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "opencode", "--name", "worker", "--claim-pr", "142")
 	if err == nil {
 		t.Fatal("expected spawn claim failure")
 	}
@@ -262,7 +262,7 @@ func TestSpawnNoTakeoverRequiresClaimPR(t *testing.T) {
 // TestSpawnCommand_RequiresName asserts `open-agents spawn` rejects a missing --name
 // without contacting the daemon.
 func TestSpawnCommand_RequiresName(t *testing.T) {
-	_, _, err := executeCLI(t, Deps{}, "spawn", "--project", "demo", "--agent", "codex")
+	_, _, err := executeCLI(t, Deps{}, "spawn", "--project", "demo", "--agent", "opencode")
 	if err == nil || ExitCode(err) != 2 || !strings.Contains(err.Error(), "--name is required") {
 		t.Fatalf("err=%v exit=%d, want --name is required", err, ExitCode(err))
 	}
@@ -303,9 +303,9 @@ func TestSpawnConfirmationIncludesDisplayName(t *testing.T) {
 				w.Header().Set("Content-Type", "application/json")
 				switch {
 				case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/demo":
-					_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo","config":{"worker":{"agent":"codex"}}}}`)
+					_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo","config":{"worker":{"agent":"opencode"}}}}`)
 				case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-					_, _ = io.WriteString(w, authorizedAgentsJSON("codex"))
+					_, _ = io.WriteString(w, authorizedAgentsJSON("opencode"))
 				case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 					_, _ = io.WriteString(w, `{"session":`+tt.sessionJSON+`,"promptBytes":0,"systemPromptBytes":0}`)
 				default:
@@ -316,7 +316,7 @@ func TestSpawnConfirmationIncludesDisplayName(t *testing.T) {
 			writeRunFileFor(t, cfg, srv)
 
 			out, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }},
-				"spawn", "--project", "demo", "--agent", "codex", "--name", "worker")
+				"spawn", "--project", "demo", "--agent", "opencode", "--name", "worker")
 			if err != nil {
 				t.Fatalf("spawn failed: %v stderr=%s", err, errOut)
 			}
@@ -336,9 +336,9 @@ func TestSpawnResolvesProjectFromEnvAndDefaultAgent(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		switch {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/demo":
-			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo","config":{"worker":{"agent":"codex"}}}}`)
+			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo","config":{"worker":{"agent":"opencode"}}}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-			_, _ = io.WriteString(w, authorizedAgentsJSON("codex"))
+			_, _ = io.WriteString(w, authorizedAgentsJSON("opencode"))
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 				t.Fatal(err)
@@ -362,7 +362,7 @@ func TestSpawnResolvesProjectFromEnvAndDefaultAgent(t *testing.T) {
 	if !strings.Contains(out, "[prompt 0 B, system 123 B]") {
 		t.Fatalf("output missing system-only prompt metrics: %s", out)
 	}
-	if req.ProjectID != "demo" || req.Harness != "codex" || req.DisplayName != "worker" {
+	if req.ProjectID != "demo" || req.Harness != "opencode" || req.DisplayName != "worker" {
 		t.Fatalf("spawn request = %#v", req)
 	}
 	want := []string{"GET /api/v1/projects/demo", "POST /api/v1/agents/readiness/ensure", "POST /api/v1/sessions"}
@@ -382,9 +382,9 @@ func TestSpawnResolvesProjectFromOpenAgentsSessionID(t *testing.T) {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/sessions/demo-1":
 			_, _ = io.WriteString(w, `{"session":`+sessionJSON("demo-1", "demo", "worker", "idle", false)+`}`)
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/demo":
-			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo","config":{"worker":{"agent":"codex"}}}}`)
+			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo","config":{"worker":{"agent":"opencode"}}}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-			_, _ = io.WriteString(w, authorizedAgentsJSON("codex"))
+			_, _ = io.WriteString(w, authorizedAgentsJSON("opencode"))
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 				t.Fatal(err)
@@ -402,7 +402,7 @@ func TestSpawnResolvesProjectFromOpenAgentsSessionID(t *testing.T) {
 	if err != nil {
 		t.Fatalf("spawn failed: %v stderr=%s", err, errOut)
 	}
-	if req.ProjectID != "demo" || req.Harness != "codex" || req.ParentSessionID != "demo-1" {
+	if req.ProjectID != "demo" || req.Harness != "opencode" || req.ParentSessionID != "demo-1" {
 		t.Fatalf("spawn request = %#v", req)
 	}
 	want := []string{"GET /api/v1/sessions/demo-1", "GET /api/v1/projects/demo", "POST /api/v1/agents/readiness/ensure", "POST /api/v1/sessions"}
@@ -429,7 +429,7 @@ func TestSpawnOpenAgentsSessionIDFailureRequiresProject(t *testing.T) {
 	writeRunFileFor(t, cfg, srv)
 	t.Setenv("OPEN_AGENTS_SESSION_ID", "missing")
 
-	_, _, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--agent", "codex", "--name", "worker")
+	_, _, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--agent", "opencode", "--name", "worker")
 	if err == nil || !strings.Contains(err.Error(), `project could not be resolved from OPEN_AGENTS_SESSION_ID "missing"; pass --project`) {
 		t.Fatalf("err=%v, want OPEN_AGENTS_SESSION_ID project error", err)
 	}
@@ -462,9 +462,9 @@ func TestSpawnResolvesProjectFromCWD(t *testing.T) {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects":
 			_, _ = io.WriteString(w, `{"projects":[{"id":"demo","name":"Demo"}]}`)
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/demo":
-			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":`+jsonQuote(repo)+`,"config":{"worker":{"agent":"codex"}}}}`)
+			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":`+jsonQuote(repo)+`,"config":{"worker":{"agent":"opencode"}}}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-			_, _ = io.WriteString(w, authorizedAgentsJSON("codex"))
+			_, _ = io.WriteString(w, authorizedAgentsJSON("opencode"))
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 				t.Fatal(err)
@@ -481,7 +481,7 @@ func TestSpawnResolvesProjectFromCWD(t *testing.T) {
 	if err != nil {
 		t.Fatalf("spawn failed: %v stderr=%s", err, errOut)
 	}
-	if req.ProjectID != "demo" || req.Harness != "codex" {
+	if req.ProjectID != "demo" || req.Harness != "opencode" {
 		t.Fatalf("spawn request = %#v", req)
 	}
 }
@@ -495,7 +495,7 @@ func TestSpawnStandaloneOmitsProject(t *testing.T) {
 		w.Header().Set("Content-Type", "application/json")
 		switch {
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-			_, _ = io.WriteString(w, authorizedAgentsJSON("codex"))
+			_, _ = io.WriteString(w, authorizedAgentsJSON("opencode"))
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 				t.Fatal(err)
@@ -508,14 +508,14 @@ func TestSpawnStandaloneOmitsProject(t *testing.T) {
 	t.Cleanup(srv.Close)
 	writeRunFileFor(t, cfg, srv)
 
-	out, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--standalone", "--agent", "codex", "--name", "Try Open Agents", "--prompt", "Try Open Agents")
+	out, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--standalone", "--agent", "opencode", "--name", "Try Open Agents", "--prompt", "Try Open Agents")
 	if err != nil {
 		t.Fatalf("spawn failed: %v stderr=%s", err, errOut)
 	}
 	if !strings.Contains(out, "spawned session standalone-1") {
 		t.Fatalf("output missing standalone session: %s", out)
 	}
-	if req.ProjectID != "" || req.Harness != "codex" || req.Kind != "worker" || req.Branch != "" {
+	if req.ProjectID != "" || req.Harness != "opencode" || req.Kind != "worker" || req.Branch != "" {
 		t.Fatalf("spawn request = %#v", req)
 	}
 	want := []string{"POST /api/v1/agents/readiness/ensure", "POST /api/v1/sessions"}
@@ -536,7 +536,7 @@ func TestSpawnStandaloneRejectsProjectOnlyOptions(t *testing.T) {
 		{name: "manager", args: []string{"--kind", "manager"}},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
-			args := []string{"spawn", "--standalone", "--agent", "codex", "--name", "Notes"}
+			args := []string{"spawn", "--standalone", "--agent", "opencode", "--name", "Notes"}
 			args = append(args, tc.args...)
 			_, _, err := executeCLI(t, Deps{}, args...)
 			if err == nil || ExitCode(err) != 2 {
@@ -552,8 +552,8 @@ func TestSpawnScratchRejectsGitOnlyFlags(t *testing.T) {
 		args    []string
 		wantErr string
 	}{
-		{name: "branch", args: []string{"spawn", "--project", "scratch", "--agent", "codex", "--name", "Scratch Task", "--branch", "feature/x"}, wantErr: "scratch projects do not support --branch"},
-		{name: "claim pr", args: []string{"spawn", "--project", "scratch", "--agent", "codex", "--name", "Scratch Task", "--claim-pr", "142"}, wantErr: "scratch projects do not support --claim-pr"},
+		{name: "branch", args: []string{"spawn", "--project", "scratch", "--agent", "opencode", "--name", "Scratch Task", "--branch", "feature/x"}, wantErr: "scratch projects do not support --branch"},
+		{name: "claim pr", args: []string{"spawn", "--project", "scratch", "--agent", "opencode", "--name", "Scratch Task", "--claim-pr", "142"}, wantErr: "scratch projects do not support --claim-pr"},
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			cfg := setConfigEnv(t)
@@ -563,7 +563,7 @@ func TestSpawnScratchRejectsGitOnlyFlags(t *testing.T) {
 				w.Header().Set("Content-Type", "application/json")
 				switch {
 				case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/scratch":
-					_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"scratch","name":"Scratch","kind":"scratch","path":"/open-agents/scratch","config":{"worker":{"agent":"codex"}}}}`)
+					_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"scratch","name":"Scratch","kind":"scratch","path":"/open-agents/scratch","config":{"worker":{"agent":"opencode"}}}}`)
 				default:
 					http.NotFound(w, r)
 				}
@@ -594,7 +594,7 @@ func TestSpawnTargetedReadinessAllowsAuthorizedAgent(t *testing.T) {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/demo":
 			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo"}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-			_, _ = io.WriteString(w, readinessAgentsJSON("codex", "installed", "authorized"))
+			_, _ = io.WriteString(w, readinessAgentsJSON("opencode", "installed", "authorized"))
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 				t.Fatal(err)
@@ -607,14 +607,14 @@ func TestSpawnTargetedReadinessAllowsAuthorizedAgent(t *testing.T) {
 	t.Cleanup(srv.Close)
 	writeRunFileFor(t, cfg, srv)
 
-	_, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "codex", "--name", "worker")
+	_, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "opencode", "--name", "worker")
 	if err != nil {
 		t.Fatalf("spawn failed: %v stderr=%s", err, errOut)
 	}
 	if errOut != "" {
 		t.Fatalf("stderr = %q, want no warning after fresh authorized probe", errOut)
 	}
-	if req.ProjectID != "demo" || req.Harness != "codex" {
+	if req.ProjectID != "demo" || req.Harness != "opencode" {
 		t.Fatalf("spawn request = %#v", req)
 	}
 	want := []string{"GET /api/v1/projects/demo", "POST /api/v1/agents/readiness/ensure", "POST /api/v1/sessions"}
@@ -634,7 +634,7 @@ func TestSpawnUnauthorizedReadinessWarnsAndAllows(t *testing.T) {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/demo":
 			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo"}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-			_, _ = io.WriteString(w, readinessAgentsJSON("codex", "installed", "unauthorized"))
+			_, _ = io.WriteString(w, readinessAgentsJSON("opencode", "installed", "unauthorized"))
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 				t.Fatal(err)
@@ -647,14 +647,14 @@ func TestSpawnUnauthorizedReadinessWarnsAndAllows(t *testing.T) {
 	t.Cleanup(srv.Close)
 	writeRunFileFor(t, cfg, srv)
 
-	_, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "codex", "--name", "worker")
+	_, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "opencode", "--name", "worker")
 	if err != nil {
 		t.Fatalf("spawn failed: %v stderr=%s", err, errOut)
 	}
 	if !strings.Contains(errOut, "may need auth according to daemon readiness") {
 		t.Fatalf("stderr missing warning: %s", errOut)
 	}
-	if req.ProjectID != "demo" || req.Harness != "codex" {
+	if req.ProjectID != "demo" || req.Harness != "opencode" {
 		t.Fatalf("spawn request = %#v", req)
 	}
 	want := []string{"GET /api/v1/projects/demo", "POST /api/v1/agents/readiness/ensure", "POST /api/v1/sessions"}
@@ -674,7 +674,7 @@ func TestSpawnUnknownAuthReadinessWarnsAndAllows(t *testing.T) {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/demo":
 			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo"}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-			_, _ = io.WriteString(w, readinessAgentsJSON("codex", "installed", "unknown"))
+			_, _ = io.WriteString(w, readinessAgentsJSON("opencode", "installed", "unknown"))
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 				t.Fatal(err)
@@ -687,14 +687,14 @@ func TestSpawnUnknownAuthReadinessWarnsAndAllows(t *testing.T) {
 	t.Cleanup(srv.Close)
 	writeRunFileFor(t, cfg, srv)
 
-	_, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "codex", "--name", "worker")
+	_, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "opencode", "--name", "worker")
 	if err != nil {
 		t.Fatalf("spawn failed: %v stderr=%s", err, errOut)
 	}
 	if !strings.Contains(errOut, "auth status is unknown") {
 		t.Fatalf("stderr missing warning: %s", errOut)
 	}
-	if req.ProjectID != "demo" || req.Harness != "codex" {
+	if req.ProjectID != "demo" || req.Harness != "opencode" {
 		t.Fatalf("spawn request = %#v", req)
 	}
 	want := []string{"GET /api/v1/projects/demo", "POST /api/v1/agents/readiness/ensure", "POST /api/v1/sessions"}
@@ -742,7 +742,7 @@ func TestSpawnNotInstalledAgentReadinessBlocks(t *testing.T) {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/demo":
 			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo"}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-			_, _ = io.WriteString(w, readinessAgentsJSON("codex", "not_installed", "unknown"))
+			_, _ = io.WriteString(w, readinessAgentsJSON("opencode", "not_installed", "unknown"))
 		default:
 			http.NotFound(w, r)
 		}
@@ -750,7 +750,7 @@ func TestSpawnNotInstalledAgentReadinessBlocks(t *testing.T) {
 	t.Cleanup(srv.Close)
 	writeRunFileFor(t, cfg, srv)
 
-	_, _, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "codex", "--name", "worker")
+	_, _, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "opencode", "--name", "worker")
 	if err == nil || !strings.Contains(err.Error(), "agent \"codex\" needs install") {
 		t.Fatalf("err=%v, want needs install", err)
 	}
@@ -771,7 +771,7 @@ func TestSpawnInstalledWithUnknownAuthWarnsAndAllows(t *testing.T) {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/demo":
 			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo"}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-			_, _ = io.WriteString(w, readinessAgentsJSON("codex", "installed", "unknown"))
+			_, _ = io.WriteString(w, readinessAgentsJSON("opencode", "installed", "unknown"))
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 				t.Fatal(err)
@@ -784,14 +784,14 @@ func TestSpawnInstalledWithUnknownAuthWarnsAndAllows(t *testing.T) {
 	t.Cleanup(srv.Close)
 	writeRunFileFor(t, cfg, srv)
 
-	_, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "codex", "--name", "worker")
+	_, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "opencode", "--name", "worker")
 	if err != nil {
 		t.Fatalf("spawn failed: %v stderr=%s", err, errOut)
 	}
 	if !strings.Contains(errOut, "auth status is unknown") {
 		t.Fatalf("stderr missing warning: %s", errOut)
 	}
-	if req.ProjectID != "demo" || req.Harness != "codex" {
+	if req.ProjectID != "demo" || req.Harness != "opencode" {
 		t.Fatalf("spawn request = %#v", req)
 	}
 	want := []string{"GET /api/v1/projects/demo", "POST /api/v1/agents/readiness/ensure", "POST /api/v1/sessions"}
@@ -811,7 +811,7 @@ func TestSpawnUnknownInstallationWarnsAndAllows(t *testing.T) {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/demo":
 			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo"}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-			_, _ = io.WriteString(w, readinessAgentsJSON("codex", "unknown", "unknown"))
+			_, _ = io.WriteString(w, readinessAgentsJSON("opencode", "unknown", "unknown"))
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 				t.Fatal(err)
@@ -824,14 +824,14 @@ func TestSpawnUnknownInstallationWarnsAndAllows(t *testing.T) {
 	t.Cleanup(srv.Close)
 	writeRunFileFor(t, cfg, srv)
 
-	_, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "codex", "--name", "worker")
+	_, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "opencode", "--name", "worker")
 	if err != nil {
 		t.Fatalf("spawn failed: %v stderr=%s", err, errOut)
 	}
 	if !strings.Contains(errOut, "installation status is unknown") {
 		t.Fatalf("stderr missing warning: %s", errOut)
 	}
-	if req.ProjectID != "demo" || req.Harness != "codex" {
+	if req.ProjectID != "demo" || req.Harness != "opencode" {
 		t.Fatalf("spawn request = %#v", req)
 	}
 	want := []string{"GET /api/v1/projects/demo", "POST /api/v1/agents/readiness/ensure", "POST /api/v1/sessions"}
@@ -859,7 +859,7 @@ func TestSpawnReadinessServerErrorBlocks(t *testing.T) {
 	t.Cleanup(srv.Close)
 	writeRunFileFor(t, cfg, srv)
 
-	_, _, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "codex", "--name", "worker")
+	_, _, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "opencode", "--name", "worker")
 	if err == nil || !strings.Contains(err.Error(), "probe failed (PROBE_FAILED) [request req-1]") {
 		t.Fatalf("err=%v, want probe server error", err)
 	}
@@ -913,7 +913,7 @@ func TestSpawnUnknownAuthEnsureWarnsAndAllows(t *testing.T) {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/demo":
 			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo"}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-			_, _ = io.WriteString(w, readinessAgentsJSON("codex", "installed", "unknown"))
+			_, _ = io.WriteString(w, readinessAgentsJSON("opencode", "installed", "unknown"))
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 				t.Fatal(err)
@@ -926,14 +926,14 @@ func TestSpawnUnknownAuthEnsureWarnsAndAllows(t *testing.T) {
 	t.Cleanup(srv.Close)
 	writeRunFileFor(t, cfg, srv)
 
-	_, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "codex", "--name", "worker")
+	_, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "opencode", "--name", "worker")
 	if err != nil {
 		t.Fatalf("spawn failed: %v stderr=%s", err, errOut)
 	}
 	if !strings.Contains(errOut, "auth status is unknown") {
 		t.Fatalf("stderr missing warning: %s", errOut)
 	}
-	if req.ProjectID != "demo" || req.Harness != "codex" {
+	if req.ProjectID != "demo" || req.Harness != "opencode" {
 		t.Fatalf("spawn request = %#v", req)
 	}
 }
@@ -957,26 +957,26 @@ func TestResolveSpawnHarness_ManagerDefault(t *testing.T) {
 	project := projectDetails{
 		ID: "demo",
 		Config: &projectConfig{
-			Worker:  roleOverride{Agent: "codex"},
-			Manager: roleOverride{Agent: "codex"},
+			Worker:  roleOverride{Agent: "opencode"},
+			Manager: roleOverride{Agent: "opencode"},
 		},
 	}
-	if got, err := resolveSpawnHarness("", "manager", project); err != nil || got != "codex" {
+	if got, err := resolveSpawnHarness("", "manager", project); err != nil || got != "opencode" {
 		t.Fatalf("manager default: got %q err %v, want codex", got, err)
 	}
-	if got, err := resolveSpawnHarness("", "worker", project); err != nil || got != "codex" {
+	if got, err := resolveSpawnHarness("", "worker", project); err != nil || got != "opencode" {
 		t.Fatalf("worker default: got %q err %v, want codex", got, err)
 	}
 	if got, err := resolveSpawnHarness("aider", "manager", project); err != nil || got != "aider" {
 		t.Fatalf("explicit agent: got %q err %v, want aider", got, err)
 	}
 	// Unset kind is the default `open-agents spawn` path and must resolve to worker.agent.
-	if got, err := resolveSpawnHarness("", "", project); err != nil || got != "codex" {
+	if got, err := resolveSpawnHarness("", "", project); err != nil || got != "opencode" {
 		t.Fatalf("unset kind: got %q err %v, want codex", got, err)
 	}
 	// Manager spawn with no manager.agent configured surfaces the
 	// --manager-agent hint (the error branch this PR adds).
-	noManager := projectDetails{ID: "demo", Config: &projectConfig{Worker: roleOverride{Agent: "codex"}}}
+	noManager := projectDetails{ID: "demo", Config: &projectConfig{Worker: roleOverride{Agent: "opencode"}}}
 	if _, err := resolveSpawnHarness("", "manager", noManager); err == nil || !strings.Contains(err.Error(), "--manager-agent") {
 		t.Fatalf("missing manager agent: err=%v, want --manager-agent hint", err)
 	}
@@ -993,7 +993,7 @@ func TestSpawnModelFlagWiring(t *testing.T) {
 		case r.Method == http.MethodGet && r.URL.Path == "/api/v1/projects/demo":
 			_, _ = io.WriteString(w, `{"status":"ok","project":{"id":"demo","name":"Demo","path":"/repo/demo"}}`)
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/agents/readiness/ensure":
-			_, _ = io.WriteString(w, authorizedAgentsJSON("codex"))
+			_, _ = io.WriteString(w, authorizedAgentsJSON("opencode"))
 		case r.Method == http.MethodPost && r.URL.Path == "/api/v1/sessions":
 			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 				t.Fatal(err)
@@ -1006,7 +1006,7 @@ func TestSpawnModelFlagWiring(t *testing.T) {
 	t.Cleanup(srv.Close)
 	writeRunFileFor(t, cfg, srv)
 
-	_, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "codex", "--name", "worker", "--model", "gpt-5.6-sol")
+	_, errOut, err := executeCLI(t, Deps{ProcessAlive: func(int) bool { return true }}, "spawn", "--project", "demo", "--agent", "opencode", "--name", "worker", "--model", "gpt-5.6-sol")
 	if err != nil {
 		t.Fatalf("spawn failed: %v stderr=%s", err, errOut)
 	}

@@ -554,9 +554,8 @@ func TestResumeUsesPersistedBypassPermissionForCapabilityAdmission(t *testing.T)
 		t.Fatalf("CreateConversation: %v", err)
 	}
 	if err := st.SetConversationSettings(ctx, conversation.ID, domain.ConversationSettings{
-		Model:           "gpt-5.6-luna",
-		ReasoningEffort: "high",
-		ApprovalMode:    domain.PermissionModeBypassPermissions,
+		Model:        "gpt-5.6-luna",
+		ApprovalMode: domain.PermissionModeBypassPermissions,
 	}, now); err != nil {
 		t.Fatalf("SetConversationSettings: %v", err)
 	}
@@ -592,15 +591,12 @@ func TestResumeUsesPersistedBypassPermissionForCapabilityAdmission(t *testing.T)
 	if resumed.Model != "gpt-5.6-luna" {
 		t.Fatalf("resume model = %q, want persisted model", resumed.Model)
 	}
-	if resumed.Effort != "high" {
-		t.Fatalf("resume effort = %q, want persisted effort", resumed.Effort)
-	}
 	controller, err := svc.Controller(testSession)
 	if err != nil {
 		t.Fatalf("Controller: %v", err)
 	}
-	if settings := controller.Settings(); settings.Model != "gpt-5.6-luna" || settings.ReasoningEffort != "high" {
-		t.Fatalf("controller settings = %+v, want persisted model and effort", settings)
+	if settings := controller.Settings(); settings.Model != "gpt-5.6-luna" {
+		t.Fatalf("controller settings = %+v, want persisted model", settings)
 	}
 }
 
@@ -613,7 +609,7 @@ func TestServicePassesRecomputedSystemPromptToResume(t *testing.T) {
 		t.Fatalf("CreateConversation: %v", err)
 	}
 	if err := st.SetConversationSettings(context.Background(), existing.ID, domain.ConversationSettings{
-		Model: "gpt-test", ReasoningEffort: "high",
+		Model: "gpt-test",
 	}, time.Now()); err != nil {
 		t.Fatalf("SetConversationSettings: %v", err)
 	}
@@ -638,15 +634,14 @@ func TestServicePassesRecomputedSystemPromptToResume(t *testing.T) {
 		t.Fatalf("Start resume: %v", err)
 	}
 	if resumed.ProviderConversationID != "thread-1" || resumed.DataDir != dataDir || resumed.WorkspacePath != workspace ||
-		resumed.SystemPrompt != "Recomputed Open Agents manager instructions" || resumed.Model != "gpt-test" ||
-		resumed.Effort != "high" {
+		resumed.SystemPrompt != "Recomputed Open Agents manager instructions" || resumed.Model != "gpt-test" {
 		t.Fatalf("resume config = %#v", resumed)
 	}
 	snapshot, err := st.LoadConversationSnapshot(context.Background(), "conversation-resume")
 	if err != nil {
 		t.Fatalf("LoadConversationSnapshot: %v", err)
 	}
-	if snapshot.Conversation.Settings.Model != "gpt-test" || snapshot.Conversation.Settings.ReasoningEffort != "high" {
+	if snapshot.Conversation.Settings.Model != "gpt-test" {
 		t.Fatalf("persisted settings = %#v", snapshot.Conversation.Settings)
 	}
 }
@@ -680,9 +675,6 @@ func TestServiceResumePreservesExplicitProviderDefaultTuning(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Start resume: %v", err)
 	}
-	if resumed.Effort != "" {
-		t.Fatalf("resume effort = %q, want persisted provider default", resumed.Effort)
-	}
 }
 
 func TestServicePersistsAndPassesInitialModelTuningBeforeProviderStart(t *testing.T) {
@@ -697,7 +689,7 @@ func TestServicePersistsAndPassesInitialModelTuningBeforeProviderStart(t *testin
 			return nil, err
 		}
 		settings := snapshot.Conversation.Settings
-		if settings.Model != "gpt-test" || settings.ReasoningEffort != "high" {
+		if settings.Model != "gpt-test" {
 			return nil, fmt.Errorf("settings were not durable before provider start: %#v", settings)
 		}
 		return conv, nil
@@ -715,7 +707,7 @@ func TestServicePersistsAndPassesInitialModelTuningBeforeProviderStart(t *testin
 	if err != nil {
 		t.Fatalf("Start: %v", err)
 	}
-	if started.Model != "gpt-test" || started.Effort != "high" {
+	if started.Model != "gpt-test" {
 		t.Fatalf("provider start config = %#v", started)
 	}
 }
@@ -1268,7 +1260,7 @@ func TestResumeImportsNativeHistoryBeforeTheChatControllerStarts(t *testing.T) {
 	if err != nil {
 		t.Fatalf("LoadConversationSnapshot: %v", err)
 	}
-	// The turn already existed from an earlier Chat interval. Codex can omit its
+	// The turn already existed from an earlier Chat interval. OpenCode can omit its
 	// persisted item ids, so the replay uses synthetic item ids even though the
 	// live assistant message used native-answer-1. Stable turn identity and the
 	// settled content keep the replay from duplicating either message, while the
@@ -1778,7 +1770,7 @@ func TestInterfaceHandoffTrustedCheckpointMayPrecedeLaterCompletedTurn(t *testin
 	}{
 		{name: "unidentified completed pair stays latest", state: domain.ConversationCheckpointComplete, assistant: "trusted checkpoint assistant", wantMismatch: true},
 		{name: "identified completed pair", state: domain.ConversationCheckpointComplete, assistant: "trusted checkpoint assistant", turnID: "checkpoint-turn"},
-		{name: "completed Codex prompt", state: domain.ConversationCheckpointComplete, turnID: "checkpoint-turn"},
+		{name: "completed OpenCode prompt", state: domain.ConversationCheckpointComplete, turnID: "checkpoint-turn"},
 		{name: "completed empty prompt identified", state: domain.ConversationCheckpointComplete, turnID: "checkpoint-turn", emptyPrompt: true},
 		{name: "missing completed empty prompt", state: domain.ConversationCheckpointComplete, turnID: "missing-current-turn", emptyPrompt: true, wantMismatch: true},
 		{name: "missing pending empty prompt", state: domain.ConversationCheckpointPrompt, turnID: "missing-current-turn", emptyPrompt: true, wantMismatch: true},
@@ -3760,7 +3752,7 @@ func TestControllerReadyDurableSettingsRefreshBeforeFirstDispatch(t *testing.T) 
 		t.Fatalf("CreateConversation: %v", err)
 	}
 	if err := st.SetConversationSettings(ctx, conversation.ID, domain.ConversationSettings{
-		Model: "source-provider-model", ReasoningEffort: "high",
+		Model: "source-provider-model",
 		ApprovalMode: domain.PermissionModeAcceptEdits,
 	}, now); err != nil {
 		t.Fatalf("seed source settings: %v", err)
@@ -3808,7 +3800,7 @@ func TestControllerReadyDurableSettingsRefreshBeforeFirstDispatch(t *testing.T) 
 	if len(sent) != 1 {
 		t.Fatalf("sent messages = %d, want 1", len(sent))
 	}
-	if sent[0].Settings.Model != "" || sent[0].Settings.Effort != "" ||
+	if sent[0].Settings.Model != "" ||
 		sent[0].Settings.Approval != domain.PermissionModeAcceptEdits {
 		t.Fatalf("activation settings = %+v, want target defaults with preserved approval", sent[0].Settings)
 	}
@@ -3840,7 +3832,7 @@ func TestControllerReadyDoesNotDependOnAFalliblePostCommitRead(t *testing.T) {
 		t.Fatalf("CreateConversation: %v", err)
 	}
 	if err := st.SetConversationSettings(ctx, conversation.ID, domain.ConversationSettings{
-		Model: "source-provider-model", ReasoningEffort: "high",
+		Model: "source-provider-model",
 		ApprovalMode: domain.PermissionModeAcceptEdits,
 	}, now); err != nil {
 		t.Fatalf("seed source settings: %v", err)
@@ -3884,7 +3876,7 @@ func TestControllerReadyDoesNotDependOnAFalliblePostCommitRead(t *testing.T) {
 		t.Fatalf("post-commit conversation reads = %d, want none", guardedStore.reads)
 	}
 	sent := conv.sentMessages()
-	if len(sent) != 1 || sent[0].Settings.Model != "" || sent[0].Settings.Effort != "" {
+	if len(sent) != 1 || sent[0].Settings.Model != "" {
 		t.Fatalf("activation retained source settings: %+v", sent)
 	}
 }
@@ -4020,7 +4012,7 @@ func TestSendWhileBusyQueuesUntilTheTurnEnds(t *testing.T) {
 	}
 }
 
-// Codex can start nested turns while the root turn is still working. A child
+// OpenCode can start nested turns while the root turn is still working. A child
 // completion is not conversation quiescence: dispatching queued automation at
 // that point injects it into the still-running root and leaves the Open Agents turn minted
 // for that automation with no matching provider lifecycle.
@@ -4114,7 +4106,7 @@ func TestNestedTurnCompletionDoesNotDrainQueueWhilePrimaryTurnRuns(t *testing.T)
 }
 
 // A Chat -> TUI handoff waits for the root turn and everything already queued
-// behind it. Nested Codex lifecycle must not make that drain look complete, nor
+// behind it. Nested OpenCode lifecycle must not make that drain look complete, nor
 // may it release the accepted queue into a root turn that is still running.
 func TestChatHandoffDrainWaitsForRootAfterNestedTurnCompletes(t *testing.T) {
 	t.Parallel()
@@ -4511,7 +4503,7 @@ func TestChatHandoffInterruptDoesNotWaitForTurnCompletion(t *testing.T) {
 	if got := turnStateByText(t, snapshot)["queued behind it"]; got != domain.TurnStateInterrupted {
 		t.Fatalf("queued turn = %q, want interrupted before the source controller stops", got)
 	}
-	// Codex may deliver turn/completed after turn/interrupt has already answered.
+	// OpenCode may deliver turn/completed after turn/interrupt has already answered.
 	// The armed dispatch gate must still make that late completion a no-op for the
 	// queue.
 	h.conv.emit(ports.ChatEvent{

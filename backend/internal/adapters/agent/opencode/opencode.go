@@ -3,7 +3,7 @@
 // workspace-local activity plugin plus the using-open-agents skill, and reading
 // plugin-derived session info.
 //
-// opencode differs from Codex in two ways Open Agents has to bridge:
+// opencode differs from other harnesses in two ways Open Agents has to bridge:
 //   - It has no native command-hook config (no settings.local.json / hooks.json
 //     equivalent). Its only lifecycle-extensibility surface is a JS/TS plugin
 //     loaded from .opencode/plugins/, so GetAgentHooks installs an Open Agents-owned
@@ -18,7 +18,7 @@
 //     enforced rule rather than a prompt convention.
 //
 // Open Agents-managed sessions derive native session identity and display metadata from
-// the opencode plugin's reported events, mirroring the Codex adapter.
+// the opencode plugin's reported events.
 package opencode
 
 import (

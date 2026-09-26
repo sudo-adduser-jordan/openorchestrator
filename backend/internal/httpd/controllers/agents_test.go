@@ -87,9 +87,9 @@ func (f *fakeAgentCatalog) RevalidateModels(_ context.Context, agentID, projectI
 func TestListAgents(t *testing.T) {
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))
 	catalog := &fakeAgentCatalog{inventory: agentsvc.Inventory{
-		Supported:  []agentsvc.Info{{ID: "codex", Label: "Codex"}},
-		Installed:  []agentsvc.Info{{ID: "codex", Label: "Codex"}},
-		Authorized: []agentsvc.Info{{ID: "codex", Label: "Codex"}},
+		Supported:  []agentsvc.Info{{ID: "opencode", Label: "OpenCode"}},
+		Installed:  []agentsvc.Info{{ID: "opencode", Label: "OpenCode"}},
+		Authorized: []agentsvc.Info{{ID: "opencode", Label: "OpenCode"}},
 	}}
 	srv := httptest.NewServer(httpd.NewRouterWithControl(config.Config{}, log, nil, httpd.APIDeps{
 		Agents: catalog,
@@ -100,7 +100,7 @@ func TestListAgents(t *testing.T) {
 	if status != http.StatusOK {
 		t.Fatalf("GET /agents = %d, body=%s", status, body)
 	}
-	for _, want := range []string{`"supported"`, `"installed"`, `"authorized"`, `"id":"codex"`} {
+	for _, want := range []string{`"supported"`, `"installed"`, `"authorized"`, `"id":"opencode"`} {
 		if !strings.Contains(string(body), want) {
 			t.Fatalf("body missing %s: %s", want, body)
 		}
@@ -116,9 +116,9 @@ func TestListAgents(t *testing.T) {
 func TestGetAgentReadinessUsesCachedSnapshot(t *testing.T) {
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))
 	catalog := &fakeAgentCatalog{readiness: agentsvc.Readiness{Agents: []domain.AgentReadinessSnapshot{{
-		ID: "codex", Label: "Codex",
-		Installation:       domain.AgentInstallationObservation{State: domain.AgentInstallationInstalled, Freshness: domain.AgentReadinessFresh, ReasonCode: domain.AgentReadinessReasonInstalled, Reason: "Codex is installed."},
-		Authentication:     domain.AgentAuthenticationObservation{State: domain.AgentAuthenticationAuthorized, Freshness: domain.AgentReadinessFresh, ReasonCode: domain.AgentReadinessReasonAuthorized, Reason: "Codex appears signed in."},
+		ID: "opencode", Label: "OpenCode",
+		Installation:       domain.AgentInstallationObservation{State: domain.AgentInstallationInstalled, Freshness: domain.AgentReadinessFresh, ReasonCode: domain.AgentReadinessReasonInstalled, Reason: "OpenCode is installed."},
+		Authentication:     domain.AgentAuthenticationObservation{State: domain.AgentAuthenticationAuthorized, Freshness: domain.AgentReadinessFresh, ReasonCode: domain.AgentReadinessReasonAuthorized, Reason: "OpenCode appears signed in."},
 		EffectiveReadiness: domain.AgentReadinessReady,
 	}}}}
 	srv := httptest.NewServer(httpd.NewRouterWithControl(config.Config{}, log, nil, httpd.APIDeps{Agents: catalog}, httpd.ControlDeps{}))
@@ -144,7 +144,7 @@ func TestEnsureAgentReadinessDecodesBatchAndPurpose(t *testing.T) {
 	srv := httptest.NewServer(httpd.NewRouterWithControl(config.Config{}, log, nil, httpd.APIDeps{Agents: catalog}, httpd.ControlDeps{}))
 	defer srv.Close()
 
-	body, status, _ := doRequest(t, srv, http.MethodPost, "/api/v1/agents/readiness/ensure", `{"agentIds":["codex","codex"],"purpose":"launch"}`)
+	body, status, _ := doRequest(t, srv, http.MethodPost, "/api/v1/agents/readiness/ensure", `{"agentIds":["opencode","opencode"],"purpose":"launch"}`)
 	if status != http.StatusOK {
 		t.Fatalf("POST /agents/readiness/ensure = %d, body=%s", status, body)
 	}
@@ -198,11 +198,11 @@ func TestEnsureAgentReadinessReturnsTypedValidationEnvelopes(t *testing.T) {
 func TestRefreshAgents(t *testing.T) {
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))
 	catalog := &fakeAgentCatalog{
-		inventory: agentsvc.Inventory{Supported: []agentsvc.Info{{ID: "codex", Label: "Codex"}}},
+		inventory: agentsvc.Inventory{Supported: []agentsvc.Info{{ID: "opencode", Label: "OpenCode"}}},
 		refreshed: agentsvc.Inventory{
-			Supported:  []agentsvc.Info{{ID: "codex", Label: "Codex"}},
-			Installed:  []agentsvc.Info{{ID: "codex", Label: "Codex"}},
-			Authorized: []agentsvc.Info{{ID: "codex", Label: "Codex"}},
+			Supported:  []agentsvc.Info{{ID: "opencode", Label: "OpenCode"}},
+			Installed:  []agentsvc.Info{{ID: "opencode", Label: "OpenCode"}},
+			Authorized: []agentsvc.Info{{ID: "opencode", Label: "OpenCode"}},
 		},
 	}
 	srv := httptest.NewServer(httpd.NewRouterWithControl(config.Config{}, log, nil, httpd.APIDeps{
@@ -214,7 +214,7 @@ func TestRefreshAgents(t *testing.T) {
 	if status != http.StatusOK {
 		t.Fatalf("POST /agents/refresh = %d, body=%s", status, body)
 	}
-	for _, want := range []string{`"supported"`, `"installed"`, `"authorized"`, `"id":"codex"`} {
+	for _, want := range []string{`"supported"`, `"installed"`, `"authorized"`, `"id":"opencode"`} {
 		if !strings.Contains(string(body), want) {
 			t.Fatalf("body missing %s: %s", want, body)
 		}
@@ -228,7 +228,7 @@ func TestProbeAgent(t *testing.T) {
 	log := slog.New(slog.NewTextHandler(io.Discard, nil))
 	catalog := &fakeAgentCatalog{
 		probed: agentsvc.ProbeResult{
-			Agent:     agentsvc.Info{ID: "codex", Label: "Codex", AuthStatus: "authorized"},
+			Agent:     agentsvc.Info{ID: "opencode", Label: "OpenCode", AuthStatus: "authorized"},
 			Supported: true,
 			Installed: true,
 		},
@@ -242,13 +242,13 @@ func TestProbeAgent(t *testing.T) {
 	if status != http.StatusOK {
 		t.Fatalf("POST /agents/codex/probe = %d, body=%s", status, body)
 	}
-	for _, want := range []string{`"supported":true`, `"installed":true`, `"id":"codex"`, `"authStatus":"authorized"`} {
+	for _, want := range []string{`"supported":true`, `"installed":true`, `"id":"opencode"`, `"authStatus":"authorized"`} {
 		if !strings.Contains(string(body), want) {
 			t.Fatalf("body missing %s: %s", want, body)
 		}
 	}
-	if catalog.probeCalls != 1 || catalog.probeAgent != "codex" {
-		t.Fatalf("probe calls=%d agent=%q, want one codex probe", catalog.probeCalls, catalog.probeAgent)
+	if catalog.probeCalls != 1 || catalog.probeAgent != "opencode" {
+		t.Fatalf("probe calls=%d agent=%q, want one opencode probe", catalog.probeCalls, catalog.probeAgent)
 	}
 }
 
@@ -267,7 +267,7 @@ func TestGetAndRefreshAgentModels(t *testing.T) {
 	} {
 		t.Run(tc.name, func(t *testing.T) {
 			catalog := &fakeAgentCatalog{models: ports.AgentModelCatalog{
-				AgentID:          "codex",
+				AgentID:          "opencode",
 				SelectionMode:    ports.ModelSelectionCatalog,
 				Models:           []ports.AgentModelInfo{{ID: "gpt-5.6-sol", Label: "GPT-5.6 Sol"}},
 				CustomModelEntry: ports.CustomModelEntryDirect,
@@ -281,7 +281,7 @@ func TestGetAndRefreshAgentModels(t *testing.T) {
 			if status != http.StatusOK {
 				t.Fatalf("%s %s = %d, body=%s", tc.method, tc.path, status, body)
 			}
-			for _, want := range []string{`"agentId":"codex"`, `"selectionMode":"catalog"`, `"customModelEntry":"direct"`, `"allowCustom":true`, `"id":"gpt-5.6-sol"`} {
+			for _, want := range []string{`"agentId":"opencode"`, `"selectionMode":"catalog"`, `"customModelEntry":"direct"`, `"allowCustom":true`, `"id":"gpt-5.6-sol"`} {
 				if !strings.Contains(string(body), want) {
 					t.Fatalf("body missing %s: %s", want, body)
 				}
@@ -290,7 +290,7 @@ func TestGetAndRefreshAgentModels(t *testing.T) {
 			if tc.wantRevalidate {
 				wantModelCalls = 0
 			}
-			if catalog.modelCalls != wantModelCalls || catalog.revalidateCalls != btoi(tc.wantRevalidate) || catalog.modelAgent != "codex" || catalog.modelProject != "proj-1" || catalog.modelRefresh != tc.wantRefresh {
+			if catalog.modelCalls != wantModelCalls || catalog.revalidateCalls != btoi(tc.wantRevalidate) || catalog.modelAgent != "opencode" || catalog.modelProject != "proj-1" || catalog.modelRefresh != tc.wantRefresh {
 				t.Fatalf("model call = count:%d revalidate:%d agent:%q project:%q refresh:%v", catalog.modelCalls, catalog.revalidateCalls, catalog.modelAgent, catalog.modelProject, catalog.modelRefresh)
 			}
 		})

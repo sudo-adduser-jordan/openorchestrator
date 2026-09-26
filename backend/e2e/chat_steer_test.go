@@ -18,7 +18,7 @@ import (
 // abandon. Only a real provider can demonstrate that, which is why this is an
 // end-to-end scenario and not a unit test.
 //
-// Measured against codex-cli 0.146.0 while writing it: the steered turn kept its id,
+// Measured against opencode 0.146.0 while writing it: the steered turn kept its id,
 // emitted one turn/started and one turn/completed, settled `completed` rather than
 // `interrupted`, and the agent aborted the shell loop it was running on its own.
 
@@ -205,7 +205,7 @@ func TestChatSteerIsRefusedForATerminalSession(t *testing.T) {
 	project := seedProject(t, d, "steertui")
 
 	tui := spawn(t, d, map[string]any{
-		"projectId": project, "kind": "worker", "harness": "codex", "mode": "tui",
+		"projectId": project, "kind": "worker", "harness": "opencode", "mode": "tui",
 		"prompt": "echo hello",
 	})
 

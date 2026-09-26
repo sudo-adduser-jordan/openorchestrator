@@ -132,7 +132,7 @@ const HOVER_ACTION_CLASS =
 const SESSION_ACTION_CLASS =
 	"sidebar-icon-action grid size-5 shrink-0 place-items-center rounded-md !bg-transparent p-1 text-passive hover:!bg-transparent focus:!bg-transparent focus-visible:!bg-transparent active:!bg-transparent data-[state=open]:!bg-transparent hover:text-foreground disabled:pointer-events-none disabled:opacity-50 [&_svg]:size-3!";
 
-// Shared nav-row chrome (Codex-style): inset pill, 14px type, no accent bar.
+// Shared nav-row chrome (Shared nav-row chrome): inset pill, 14px type, no accent bar.
 // Plain fill stays for non-interactive status rows; interactive rows use
 // {@link NavRowHighlight} via {@link NAV_ROW_HIGHLIGHT_HOST_CLASS}.
 const NAV_ROW_CLASS =

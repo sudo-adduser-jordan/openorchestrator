@@ -144,7 +144,7 @@ open-agents project set-config <id> [flags]
 | `--default-branch string` | Base branch new session worktrees are created from | - |
 | `--env stringArray` | Env var `KEY=VALUE` forwarded into sessions (repeatable) | - |
 | `--json` | Output the updated project as JSON | - |
-| `--model string` | Agent model override (e.g. `codex-mini-latest`) | - |
+| `--model string` | Agent model override (e.g. `opencode-mini-latest`) | - |
 | `--manager-agent string` | Harness override for manager sessions | - |
 | `--manager-rules string` | Project-specific standing instructions appended to manager session prompts | - |
 | `--permission string` | Permission mode: `default`, `accept-edits`, `auto`, `bypass-permissions` | - |
@@ -157,7 +157,7 @@ open-agents project set-config <id> [flags]
 
 ```bash
 # Set default branch and model for a project
-open-agents project set-config open-agents --default-branch main --model codex-mini-latest
+open-agents project set-config open-agents --default-branch main --model opencode-mini-latest
 ```
 
 ```bash

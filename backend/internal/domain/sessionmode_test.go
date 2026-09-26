@@ -44,8 +44,8 @@ func TestNormalizeSessionModeFallsBackToTUI(t *testing.T) {
 // Requested modes are parsed strictly. Collapsing an unrecognized request to TUI
 // would silently put the caller in a native terminal they deliberately disabled.
 func TestParseSessionModeRejectsUnknownInsteadOfFallingBack(t *testing.T) {
-	if _, err := ParseSessionMode("codex-tui"); err == nil {
-		t.Fatal("ParseSessionMode(\"codex-tui\") = nil error, want a rejection")
+	if _, err := ParseSessionMode("opencode-tui"); err == nil {
+		t.Fatal("ParseSessionMode(\"opencode-tui\") = nil error, want a rejection")
 	}
 
 	// Absent is not invalid: callers apply their own precedence to the zero value.

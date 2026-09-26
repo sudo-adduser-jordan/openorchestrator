@@ -440,7 +440,7 @@ func TestCreateCommandTerminalExitsWhenCommandCompletes(t *testing.T) {
 	_, err := r.Create(context.Background(), ports.RuntimeConfig{
 		SessionID:               "command-1",
 		WorkspacePath:           "/tmp/ws",
-		Argv:                    []string{"open-agents", "codex-login"},
+		Argv:                    []string{"open-agents", "opencode-login"},
 		ExitOnCommandCompletion: true,
 	})
 	if err != nil {
@@ -719,7 +719,7 @@ func TestRestartRespawnsExistingPaneAndPreservesHandle(t *testing.T) {
 	cfg := ports.RuntimeConfig{
 		SessionID:     "sess-1",
 		WorkspacePath: "/tmp/ws",
-		Argv:          []string{"codex", "resume", "native-1"},
+		Argv:          []string{"opencode", "resume", "native-1"},
 		Env:           map[string]string{"OPEN_AGENTS_SESSION_ID": "sess-1"},
 	}
 
@@ -746,7 +746,7 @@ func TestRestartRejectsMismatchedSessionHandle(t *testing.T) {
 	_, err := r.Restart(context.Background(), ports.RuntimeHandle{ID: "sess-1"}, ports.RuntimeConfig{
 		SessionID:     "sess-2",
 		WorkspacePath: "/tmp/ws",
-		Argv:          []string{"codex"},
+		Argv:          []string{"opencode"},
 	})
 	if err == nil || !strings.Contains(err.Error(), "does not match") {
 		t.Fatalf("Restart error = %v, want handle mismatch", err)
@@ -1054,7 +1054,7 @@ func TestIsSupervisedProcessAliveFindsExactDescendant(t *testing.T) {
 	r, fr := newTestRuntime(0)
 	fr.outputs = [][]byte{
 		[]byte("100\n"),
-		[]byte("100 1 /bin/sh -c launch\n101 100 /opt/open-agents agent-process supervise --session sess-1 --launch launch-2 -- codex\n102 101 codex\n"),
+		[]byte("100 1 /bin/sh -c launch\n101 100 /opt/open-agents agent-process supervise --session sess-1 --launch launch-2 -- opencode\n102 101 opencode\n"),
 	}
 
 	alive, err := r.IsSupervisedProcessAlive(context.Background(), ports.RuntimeHandle{ID: "sess-1"}, ports.SupervisedProcessRef{
@@ -1070,7 +1070,7 @@ func TestIsSupervisedProcessAliveFindsExactDescendant(t *testing.T) {
 }
 
 func TestIsSupervisedProcessAliveRejectsStaleAndUnrelatedProcesses(t *testing.T) {
-	entries, err := parseProcessTable("100 1 /bin/sh\n101 100 /opt/open-agents agent-process supervise --session sess-1 --launch launch-old -- codex\n102 101 codex\n200 1 /opt/open-agents agent-process supervise --session sess-1 --launch launch-new -- codex\n201 200 codex\n")
+	entries, err := parseProcessTable("100 1 /bin/sh\n101 100 /opt/open-agents agent-process supervise --session sess-1 --launch launch-old -- opencode\n102 101 opencode\n200 1 /opt/open-agents agent-process supervise --session sess-1 --launch launch-new -- opencode\n201 200 opencode\n")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1086,7 +1086,7 @@ func TestIsSupervisedProcessAliveRejectsStaleAndUnrelatedProcesses(t *testing.T)
 }
 
 func TestExactSupervisedWorkloadRejectsSupervisorReportingExitedChild(t *testing.T) {
-	entries, err := parseProcessTable("100 1 /bin/sh\n101 100 /opt/open-agents agent-process supervise --session sess-1 --launch launch-2 -- codex\n")
+	entries, err := parseProcessTable("100 1 /bin/sh\n101 100 /opt/open-agents agent-process supervise --session sess-1 --launch launch-2 -- opencode\n")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1099,7 +1099,7 @@ func TestExactSupervisedWorkloadRejectsSupervisorReportingExitedChild(t *testing
 }
 
 func TestIsSupervisedProcessAliveFindsManualRelaunchFromPreservedShell(t *testing.T) {
-	entries, err := parseProcessTable("100 1 /bin/zsh -i\n101 100 codex resume native-1\n102 101 codex worker\n")
+	entries, err := parseProcessTable("100 1 /bin/zsh -i\n101 100 opencode resume native-1\n102 101 opencode worker\n")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -1112,7 +1112,7 @@ func TestIsExactSupervisedProcessAliveRejectsManualRelaunchFromPreservedShell(t 
 	r, fr := newTestRuntime(0)
 	fr.outputs = [][]byte{
 		[]byte("100\n"),
-		[]byte("100 1 /bin/zsh -i\n101 100 codex resume native-1\n102 101 codex worker\n"),
+		[]byte("100 1 /bin/zsh -i\n101 100 opencode resume native-1\n102 101 opencode worker\n"),
 	}
 	alive, err := r.IsExactSupervisedProcessAlive(context.Background(), ports.RuntimeHandle{ID: "sess-1"}, ports.SupervisedProcessRef{
 		SessionID: "sess-1",
@@ -1128,7 +1128,7 @@ func TestProbeFencedRuntimeExactProcessMatchIsAlive(t *testing.T) {
 	fr.outputs = [][]byte{
 		nil,
 		[]byte("100\n"),
-		[]byte("100 1 /bin/zsh -i\n101 100 /opt/open-agents agent-process supervise --session sess-1 --launch launch-2 -- codex\n102 101 codex worker\n"),
+		[]byte("100 1 /bin/zsh -i\n101 100 /opt/open-agents agent-process supervise --session sess-1 --launch launch-2 -- opencode\n102 101 opencode worker\n"),
 	}
 
 	got := r.ProbeFencedRuntime(context.Background(), ports.FencedRuntimeRef{
@@ -1144,7 +1144,7 @@ func TestProbeFencedRuntimeAmbiguousIdentityIsUnknown(t *testing.T) {
 	fr.outputs = [][]byte{
 		nil,
 		[]byte("100\n"),
-		[]byte("100 1 /bin/zsh -i\n101 100 /opt/open-agents agent-process supervise --session sess-1 --launch launch-other -- codex\n102 101 codex worker\n"),
+		[]byte("100 1 /bin/zsh -i\n101 100 /opt/open-agents agent-process supervise --session sess-1 --launch launch-other -- opencode\n102 101 opencode worker\n"),
 	}
 
 	got := r.ProbeFencedRuntime(context.Background(), ports.FencedRuntimeRef{
@@ -1160,7 +1160,7 @@ func TestProbeFencedRuntimeExactSupervisorWithoutChildIsDead(t *testing.T) {
 	fr.outputs = [][]byte{
 		nil,
 		[]byte("100\n"),
-		[]byte("100 1 /bin/zsh -i\n101 100 /opt/open-agents agent-process supervise --session sess-1 --launch launch-2 -- codex\n"),
+		[]byte("100 1 /bin/zsh -i\n101 100 /opt/open-agents agent-process supervise --session sess-1 --launch launch-2 -- opencode\n"),
 	}
 
 	got := r.ProbeFencedRuntime(context.Background(), ports.FencedRuntimeRef{
@@ -1176,7 +1176,7 @@ func TestProbeFencedRuntimeManualRelaunchWithoutSupervisorIsUnknown(t *testing.T
 	fr.outputs = [][]byte{
 		nil,
 		[]byte("100\n"),
-		[]byte("100 1 /bin/zsh -i\n101 100 codex resume native-1\n102 101 codex worker\n"),
+		[]byte("100 1 /bin/zsh -i\n101 100 opencode resume native-1\n102 101 opencode worker\n"),
 	}
 
 	got := r.ProbeFencedRuntime(context.Background(), ports.FencedRuntimeRef{
@@ -1208,7 +1208,7 @@ func TestProbeFencedRuntimeMultipleSupervisorGenerationsIsUnknown(t *testing.T) 
 	fr.outputs = [][]byte{
 		nil,
 		[]byte("100\n"),
-		[]byte("100 1 /bin/zsh -i\n101 100 /opt/open-agents agent-process supervise --session sess-1 --launch launch-2 -- codex\n201 100 /opt/open-agents agent-process supervise --session sess-1 --launch launch-other -- codex\n202 201 codex worker\n"),
+		[]byte("100 1 /bin/zsh -i\n101 100 /opt/open-agents agent-process supervise --session sess-1 --launch launch-2 -- opencode\n201 100 /opt/open-agents agent-process supervise --session sess-1 --launch launch-other -- opencode\n202 201 opencode worker\n"),
 	}
 
 	got := r.ProbeFencedRuntime(context.Background(), ports.FencedRuntimeRef{
@@ -1249,7 +1249,7 @@ func TestPartialCreateCleanupFailureExposesRuntimeEffectEvidence(t *testing.T) {
 	r.reapSessions = (&recordingReaper{}).reap
 
 	handle, err := r.Create(context.Background(), ports.RuntimeConfig{
-		SessionID: "sess-partial", WorkspacePath: "/tmp/ws", Argv: []string{"codex"},
+		SessionID: "sess-partial", WorkspacePath: "/tmp/ws", Argv: []string{"opencode"},
 	})
 	if handle.ID != "" || err == nil {
 		t.Fatalf("Create partial = (%+v, %v), want empty direct handle and evidence error", handle, err)

@@ -8,13 +8,6 @@ import (
 	"github.com/sudo-adduser-jordan/open-agents/backend/internal/domain"
 )
 
-var (
-	// ErrUnsupportedEffort reports a value the selected model did not advertise.
-	ErrUnsupportedEffort = errors.New("unsupported model effort")
-	// ErrModelCapabilitiesUnavailable reports tuning that cannot be validated safely.
-	ErrModelCapabilitiesUnavailable = errors.New("model capabilities unavailable")
-)
-
 // ErrAgentBinaryNotFound is returned by agent adapters when neither PATH nor
 // any well-known install location holds the agent's binary. The session
 // manager surfaces this BEFORE creating the runtime so a missing CLI doesn't
@@ -44,7 +37,7 @@ const (
 	AgentAuthStatusUnknown AgentAuthStatus = "unknown"
 )
 
-// Agent is the contract every CLI coding agent adapter (codex, …)
+// Agent is the contract every CLI coding agent adapter (opencode, …)
 // must satisfy. It supplies the argv and process configuration the Session
 // Manager needs to launch, restore, and read back a native agent session.
 type Agent interface {
@@ -182,12 +175,10 @@ const (
 
 // AgentModelInfo is one model or mode that an adapter reports as selectable.
 type AgentModelInfo struct {
-	ID            string   `json:"id"`
-	Label         string   `json:"label"`
-	Provider      string   `json:"provider,omitempty"`
-	IsDefault     bool     `json:"isDefault,omitempty"`
-	Efforts       []string `json:"efforts,omitempty"`
-	DefaultEffort string   `json:"defaultEffort,omitempty"`
+	ID        string `json:"id"`
+	Label     string `json:"label"`
+	Provider  string `json:"provider,omitempty"`
+	IsDefault bool   `json:"isDefault,omitempty"`
 	// Cost is the model's cost class, empty when the adapter cannot tell.
 	Cost AgentModelCost `json:"cost,omitempty" enum:"free,paid"`
 }
@@ -371,7 +362,7 @@ type SubmitActivitySignaler interface {
 //     event whose payload carries tool_use_id, which the lifecycle correlator
 //     matches against the inflight map populated by PreToolUse.
 //
-// codex maps permission-request to waiting_input and opts out (no tool trio →
+// opencode maps permission-request to waiting_input and opts out (no tool trio →
 // blocked could not be cleared). Adapters that later gain a correlatable
 // blocked signal implement this interface to opt in.
 type BlockedActivitySignaler interface {

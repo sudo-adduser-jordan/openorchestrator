@@ -26,7 +26,7 @@ import (
 // if the provider disagrees. Silently steering a different turn would put the
 // user's correction on work they were not looking at.
 //
-// The returned ref is the turn that absorbed the guidance. Against Codex
+// The returned ref is the turn that absorbed the guidance. Against opencode
 // 0.146.0 that is the same turn id, but it is returned rather than assumed: a
 // provider that answered with a new turn would otherwise leave Open Agents attributing the
 // steer to the wrong one.
@@ -44,12 +44,12 @@ var (
 	// Deliberately not ErrChatNoActiveTurn: that sentinel is documented as an
 	// interrupt finding nothing to cancel, and reads back to the user as a message
 	// about stopping the agent. It is also reachable at a moment interrupt never
-	// sees — Codex refuses a steer for a turn it has accepted but not yet
+	// sees — opencode refuses a steer for a turn it has accepted but not yet
 	// announced, so this fires in the window between turn/start returning and the
 	// turn actually starting.
 	ErrChatNoSteerableTurn = errors.New("no active turn to steer")
 	// ErrChatTurnNotSteerable means a turn IS running but its kind cannot absorb
-	// guidance. Codex refuses a compaction or a review turn this way: those are
+	// guidance. opencode refuses a compaction or a review turn this way: those are
 	// machine-driven turns with no room for a user's correction.
 	ErrChatTurnNotSteerable = errors.New("the running turn cannot be steered")
 	// ErrChatSteerContentUnsupported means the driver cannot deliver every prompt

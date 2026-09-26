@@ -9,7 +9,7 @@ import (
 )
 
 func TestEnsureWorkspaceGitignoreWritesSelfIgnoringFile(t *testing.T) {
-	dir := filepath.Join(t.TempDir(), ".codex")
+	dir := filepath.Join(t.TempDir(), ".opencode")
 	if err := EnsureWorkspaceGitignore(dir, "hooks.json", "config.toml"); err != nil {
 		t.Fatalf("ensure: %v", err)
 	}
@@ -31,7 +31,7 @@ func TestEnsureWorkspaceGitignoreWritesSelfIgnoringFile(t *testing.T) {
 }
 
 func TestEnsureWorkspaceGitignoreIsIdempotent(t *testing.T) {
-	dir := filepath.Join(t.TempDir(), ".codex")
+	dir := filepath.Join(t.TempDir(), ".opencode")
 	if err := EnsureWorkspaceGitignore(dir, "hooks.json"); err != nil {
 		t.Fatalf("first ensure: %v", err)
 	}
@@ -92,7 +92,7 @@ func TestIsExecutableFileChecksExecBit(t *testing.T) {
 }
 
 func TestEnsureWorkspaceGitignoreLeavesForeignFileUntouched(t *testing.T) {
-	dir := filepath.Join(t.TempDir(), ".codex")
+	dir := filepath.Join(t.TempDir(), ".opencode")
 	if err := os.MkdirAll(dir, 0o750); err != nil {
 		t.Fatalf("mkdir: %v", err)
 	}

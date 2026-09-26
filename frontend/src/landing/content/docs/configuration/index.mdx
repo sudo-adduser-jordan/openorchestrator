@@ -19,7 +19,7 @@ To set the default agents while registering the project:
 
 ```bash
 open-agents project add --path /absolute/path/to/repo \
-  --worker-agent codex \
+  --worker-agent opencode \
   --manager-agent opencode
 ```
 
@@ -36,7 +36,7 @@ Fresh installations include a Scratch project for work that does not need Git. S
 ```bash
 open-agents project ls
 open-agents project get <project-id>
-open-agents project set-config <project-id> --worker-agent codex
+open-agents project set-config <project-id> --worker-agent opencode
 ```
 
 `set-config` replaces the stored project configuration. Prefer project settings in the desktop app for interactive edits, or first inspect `open-agents project get <project-id> --json` before replacing configuration in a script. `--config-json` accepts a JSON object string, not a filename.
@@ -67,7 +67,7 @@ Every session commits to one interface at a time:
 - **Chat** uses a structured, runtime-less provider controller with durable messages, activities, approvals, and usage.
 - **Terminal UI** runs the agent's native terminal interface through Open Agents's terminal runtime.
 
-Choose the default for new sessions in project settings. You can also select it explicitly from the new-session flow or with `open-agents spawn --mode chat|tui`. Compatible Codex and OpenCode sessions can switch interfaces later without changing the Open Agents session or worktree.
+Choose the default for new sessions in project settings. You can also select it explicitly from the new-session flow or with `open-agents spawn --mode chat|tui`. Compatible OpenCode and OpenCode sessions can switch interfaces later without changing the Open Agents session or worktree.
 
 <Cards>
 	<Card title="Projects" href="/docs/configuration/projects" description="Configure one project and its session roles." />

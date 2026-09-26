@@ -129,17 +129,17 @@ func TestReadinessCoordinatorStartsWithDeterministicUnknownSnapshots(t *testing.
 func TestReadinessCoordinatorEnsureNormalizesInstalledAndAuthorized(t *testing.T) {
 	t.Parallel()
 	agent := &readinessTestAgent{
-		resolve: func(context.Context) (string, error) { return "/bin/codex", nil },
+		resolve: func(context.Context) (string, error) { return "/bin/opencode", nil },
 		auth:    func(context.Context) (ports.AgentAuthStatus, error) { return ports.AgentAuthStatusAuthorized, nil },
 	}
 	coordinator := newReadinessCoordinator(readinessCoordinatorConfig{
-		Agents: []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", agent)},
+		Agents: []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", agent)},
 		Factory: func() []agentregistry.HarnessAgent {
-			return []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", agent)}
+			return []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", agent)}
 		},
 	})
 
-	got, err := coordinator.Ensure(context.Background(), []string{"codex", "codex"}, domain.AgentReadinessPurposeLaunch)
+	got, err := coordinator.Ensure(context.Background(), []string{"opencode", "opencode"}, domain.AgentReadinessPurposeLaunch)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -171,7 +171,7 @@ func TestReadinessCoordinatorSingleFlightAndCallerCancellation(t *testing.T) {
 			once.Do(func() { close(started) })
 			select {
 			case <-release:
-				return "/bin/codex", nil
+				return "/bin/opencode", nil
 			case <-ctx.Done():
 				return "", ctx.Err()
 			}
@@ -179,15 +179,15 @@ func TestReadinessCoordinatorSingleFlightAndCallerCancellation(t *testing.T) {
 		auth: func(context.Context) (ports.AgentAuthStatus, error) { return ports.AgentAuthStatusAuthorized, nil },
 	}
 	coordinator := newReadinessCoordinator(readinessCoordinatorConfig{
-		Agents: []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", agent)},
+		Agents: []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", agent)},
 		Factory: func() []agentregistry.HarnessAgent {
-			return []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", agent)}
+			return []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", agent)}
 		},
 	})
 
 	firstDone := make(chan error, 1)
 	go func() {
-		_, err := coordinator.Ensure(context.Background(), []string{"codex"}, domain.AgentReadinessPurposeLaunch)
+		_, err := coordinator.Ensure(context.Background(), []string{"opencode"}, domain.AgentReadinessPurposeLaunch)
 		firstDone <- err
 	}()
 	<-started
@@ -199,7 +199,7 @@ func TestReadinessCoordinatorSingleFlightAndCallerCancellation(t *testing.T) {
 	waiterCtx, cancel := context.WithCancel(context.Background())
 	waiterDone := make(chan error, 1)
 	go func() {
-		_, err := coordinator.Ensure(waiterCtx, []string{"codex"}, domain.AgentReadinessPurposeLaunch)
+		_, err := coordinator.Ensure(waiterCtx, []string{"opencode"}, domain.AgentReadinessPurposeLaunch)
 		waiterDone <- err
 	}()
 	cancel()
@@ -219,11 +219,11 @@ func TestReadinessCoordinatorUsesPurposeSpecificFreshnessWindows(t *testing.T) {
 	t.Parallel()
 	now := time.Date(2026, 8, 28, 12, 0, 0, 0, time.UTC)
 	agent := &readinessTestAgent{
-		resolve: func(context.Context) (string, error) { return "/bin/codex", nil },
+		resolve: func(context.Context) (string, error) { return "/bin/opencode", nil },
 		auth:    func(context.Context) (ports.AgentAuthStatus, error) { return ports.AgentAuthStatusAuthorized, nil },
 	}
 	coordinator := newReadinessCoordinator(readinessCoordinatorConfig{
-		Agents:     []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", agent)},
+		Agents:     []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", agent)},
 		Now:        func() time.Time { return now },
 		DisplayTTL: 5 * time.Minute,
 		LaunchTTL:  30 * time.Second,
@@ -263,14 +263,14 @@ func TestReadinessCoordinatorFailurePreservesKnownStateAndLaunchBypassesRetry(t 
 			if fail.Load() {
 				return "", errors.New("secret token must not leak")
 			}
-			return "/bin/codex", nil
+			return "/bin/opencode", nil
 		},
 		auth: func(context.Context) (ports.AgentAuthStatus, error) { return ports.AgentAuthStatusAuthorized, nil },
 	}
 	coordinator := newReadinessCoordinator(readinessCoordinatorConfig{
-		Agents: []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", agent)},
+		Agents: []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", agent)},
 		Factory: func() []agentregistry.HarnessAgent {
-			return []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", agent)}
+			return []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", agent)}
 		},
 		Now:         func() time.Time { return now },
 		DisplayTTL:  5 * time.Minute,
@@ -285,7 +285,7 @@ func TestReadinessCoordinatorFailurePreservesKnownStateAndLaunchBypassesRetry(t 
 
 	fail.Store(true)
 	now = now.Add(31 * time.Second)
-	failed, err := coordinator.Ensure(context.Background(), []string{"codex"}, domain.AgentReadinessPurposeLaunch)
+	failed, err := coordinator.Ensure(context.Background(), []string{"opencode"}, domain.AgentReadinessPurposeLaunch)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -306,13 +306,13 @@ func TestReadinessCoordinatorFailurePreservesKnownStateAndLaunchBypassesRetry(t 
 	}
 
 	before := agent.resolveCalls.Load()
-	if _, err := coordinator.Ensure(context.Background(), []string{"codex"}, domain.AgentReadinessPurposeDisplay); err != nil {
+	if _, err := coordinator.Ensure(context.Background(), []string{"opencode"}, domain.AgentReadinessPurposeDisplay); err != nil {
 		t.Fatal(err)
 	}
 	if agent.resolveCalls.Load() != before {
 		t.Fatal("display ensure ignored retry delay")
 	}
-	if _, err := coordinator.Ensure(context.Background(), []string{"codex"}, domain.AgentReadinessPurposeLaunch); err != nil {
+	if _, err := coordinator.Ensure(context.Background(), []string{"opencode"}, domain.AgentReadinessPurposeLaunch); err != nil {
 		t.Fatal(err)
 	}
 	if agent.resolveCalls.Load() != before+1 {
@@ -326,10 +326,10 @@ func TestReadinessCoordinatorUsesFreshAdapterInstances(t *testing.T) {
 	factory := func() []agentregistry.HarnessAgent {
 		generations.Add(1)
 		a := &readinessTestAgent{
-			resolve: func(context.Context) (string, error) { return "/bin/codex", nil },
+			resolve: func(context.Context) (string, error) { return "/bin/opencode", nil },
 			auth:    func(context.Context) (ports.AgentAuthStatus, error) { return ports.AgentAuthStatusAuthorized, nil },
 		}
-		return []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", a)}
+		return []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", a)}
 	}
 	coordinator := newReadinessCoordinator(readinessCoordinatorConfig{
 		Agents:  factory(),
@@ -338,7 +338,7 @@ func TestReadinessCoordinatorUsesFreshAdapterInstances(t *testing.T) {
 	if _, err := coordinator.Ensure(context.Background(), nil, domain.AgentReadinessPurposeLaunch); err != nil {
 		t.Fatal(err)
 	}
-	coordinator.Invalidate("codex", readinessInvalidateInstallation)
+	coordinator.Invalidate("opencode", readinessInvalidateInstallation)
 	if _, err := coordinator.Ensure(context.Background(), nil, domain.AgentReadinessPurposeLaunch); err != nil {
 		t.Fatal(err)
 	}
@@ -408,7 +408,7 @@ func TestReadinessCoordinatorClassifiesTimeouts(t *testing.T) {
 		auth: func(context.Context) (ports.AgentAuthStatus, error) { return ports.AgentAuthStatusUnknown, nil },
 	}
 	coordinator := newReadinessCoordinator(readinessCoordinatorConfig{
-		Agents:         []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", agent)},
+		Agents:         []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", agent)},
 		InstallTimeout: 10 * time.Millisecond,
 	})
 
@@ -430,14 +430,14 @@ func TestReadinessCoordinatorClassifiesTimeouts(t *testing.T) {
 func TestReadinessCoordinatorClassifiesAuthenticationTimeout(t *testing.T) {
 	t.Parallel()
 	agent := &readinessTestAgent{
-		resolve: func(context.Context) (string, error) { return "/bin/codex", nil },
+		resolve: func(context.Context) (string, error) { return "/bin/opencode", nil },
 		auth: func(ctx context.Context) (ports.AgentAuthStatus, error) {
 			<-ctx.Done()
 			return ports.AgentAuthStatusUnknown, ctx.Err()
 		},
 	}
 	coordinator := newReadinessCoordinator(readinessCoordinatorConfig{
-		Agents:      []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", agent)},
+		Agents:      []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", agent)},
 		AuthTimeout: 10 * time.Millisecond,
 	})
 
@@ -461,26 +461,26 @@ func TestReadinessCoordinatorJoinCompletesChecksMissingFromInFlightWork(t *testi
 		resolve: func(context.Context) (string, error) {
 			close(started)
 			<-release
-			return "/bin/codex", nil
+			return "/bin/opencode", nil
 		},
 		auth: func(context.Context) (ports.AgentAuthStatus, error) {
 			return ports.AgentAuthStatusAuthorized, nil
 		},
 	}
 	coordinator := newReadinessCoordinator(readinessCoordinatorConfig{
-		Agents: []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", agent)},
+		Agents: []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", agent)},
 	})
 
 	presenceDone := make(chan error, 1)
 	go func() {
-		_, err := coordinator.EnsureInstallation(context.Background(), []string{"codex"}, domain.AgentReadinessPurposeLaunch)
+		_, err := coordinator.EnsureInstallation(context.Background(), []string{"opencode"}, domain.AgentReadinessPurposeLaunch)
 		presenceDone <- err
 	}()
 	<-started
 
 	fullDone := make(chan error, 1)
 	go func() {
-		_, err := coordinator.Ensure(context.Background(), []string{"codex"}, domain.AgentReadinessPurposeLaunch)
+		_, err := coordinator.Ensure(context.Background(), []string{"opencode"}, domain.AgentReadinessPurposeLaunch)
 		fullDone <- err
 	}()
 	close(release)
@@ -604,26 +604,26 @@ func TestReadinessCoordinatorInvalidationDuringCheckRemainsStale(t *testing.T) {
 				close(started)
 				<-release
 			}
-			return "/bin/codex", nil
+			return "/bin/opencode", nil
 		},
 		auth: func(context.Context) (ports.AgentAuthStatus, error) {
 			return ports.AgentAuthStatusAuthorized, nil
 		},
 	}
 	coordinator := newReadinessCoordinator(readinessCoordinatorConfig{
-		Agents: []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", agent)},
+		Agents: []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", agent)},
 	})
 
 	initialDone := make(chan error, 1)
 	go func() {
-		_, err := coordinator.Ensure(context.Background(), []string{"codex"}, domain.AgentReadinessPurposeLaunch)
+		_, err := coordinator.Ensure(context.Background(), []string{"opencode"}, domain.AgentReadinessPurposeLaunch)
 		initialDone <- err
 	}()
 	<-started
-	coordinator.Invalidate("codex", readinessInvalidateInstallation)
+	coordinator.Invalidate("opencode", readinessInvalidateInstallation)
 	recheckDone := make(chan error, 1)
 	go func() {
-		_, err := coordinator.Ensure(context.Background(), []string{"codex"}, domain.AgentReadinessPurposeLaunch)
+		_, err := coordinator.Ensure(context.Background(), []string{"opencode"}, domain.AgentReadinessPurposeLaunch)
 		recheckDone <- err
 	}()
 	close(release)
@@ -652,7 +652,7 @@ func TestReadinessCoordinatorUsesConfiguredRetryBackoff(t *testing.T) {
 	}
 	delays := []time.Duration{15 * time.Second, time.Minute, 5 * time.Minute}
 	coordinator := newReadinessCoordinator(readinessCoordinatorConfig{
-		Agents:      []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", agent)},
+		Agents:      []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", agent)},
 		Context:     daemonCtx,
 		Now:         func() time.Time { return now },
 		RetryDelays: delays,
@@ -663,7 +663,7 @@ func TestReadinessCoordinatorUsesConfiguredRetryBackoff(t *testing.T) {
 			t.Fatal(err)
 		}
 		coordinator.mu.Lock()
-		gotDelay := coordinator.entries["codex"].nextRetryAt.Sub(now)
+		gotDelay := coordinator.entries["opencode"].nextRetryAt.Sub(now)
 		coordinator.mu.Unlock()
 		if gotDelay != wantDelay {
 			t.Fatalf("attempt %d retry delay = %s, want %s", attempt+1, gotDelay, wantDelay)
@@ -674,17 +674,17 @@ func TestReadinessCoordinatorUsesConfiguredRetryBackoff(t *testing.T) {
 func TestReadinessCoordinatorInvalidationTargetsOnlyRequiredObservation(t *testing.T) {
 	t.Parallel()
 	agent := &readinessTestAgent{
-		resolve: func(context.Context) (string, error) { return "/bin/codex", nil },
+		resolve: func(context.Context) (string, error) { return "/bin/opencode", nil },
 		auth:    func(context.Context) (ports.AgentAuthStatus, error) { return ports.AgentAuthStatusAuthorized, nil },
 	}
 	coordinator := newReadinessCoordinator(readinessCoordinatorConfig{
-		Agents: []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", agent)},
+		Agents: []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", agent)},
 	})
 	if _, err := coordinator.Ensure(context.Background(), nil, domain.AgentReadinessPurposeLaunch); err != nil {
 		t.Fatal(err)
 	}
 
-	coordinator.Invalidate("codex", readinessInvalidateAuthentication)
+	coordinator.Invalidate("opencode", readinessInvalidateAuthentication)
 	if _, err := coordinator.Ensure(context.Background(), nil, domain.AgentReadinessPurposeLaunch); err != nil {
 		t.Fatal(err)
 	}
@@ -704,17 +704,17 @@ func TestReadinessCoordinatorRechecksAuthenticationAfterInstallTransition(t *tes
 			if !installed.Load() {
 				return "", ports.ErrAgentBinaryNotFound
 			}
-			return "/bin/codex", nil
+			return "/bin/opencode", nil
 		},
 		auth: func(context.Context) (ports.AgentAuthStatus, error) {
 			return ports.AgentAuthStatusAuthorized, nil
 		},
 	}
 	coordinator := newReadinessCoordinator(readinessCoordinatorConfig{
-		Agents: []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", agent)},
+		Agents: []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", agent)},
 	})
 
-	initial, err := coordinator.Ensure(context.Background(), []string{"codex"}, domain.AgentReadinessPurposeLaunch)
+	initial, err := coordinator.Ensure(context.Background(), []string{"opencode"}, domain.AgentReadinessPurposeLaunch)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -726,8 +726,8 @@ func TestReadinessCoordinatorRechecksAuthenticationAfterInstallTransition(t *tes
 	}
 
 	installed.Store(true)
-	coordinator.Invalidate("codex", readinessInvalidateInstallation)
-	updated, err := coordinator.Ensure(context.Background(), []string{"codex"}, domain.AgentReadinessPurposeLaunch)
+	coordinator.Invalidate("opencode", readinessInvalidateInstallation)
+	updated, err := coordinator.Ensure(context.Background(), []string{"opencode"}, domain.AgentReadinessPurposeLaunch)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -747,14 +747,14 @@ func TestReadinessCoordinatorWarmDoesNotBlock(t *testing.T) {
 		resolve: func(context.Context) (string, error) {
 			close(started)
 			<-release
-			return "/bin/codex", nil
+			return "/bin/opencode", nil
 		},
 		auth: func(context.Context) (ports.AgentAuthStatus, error) {
 			return ports.AgentAuthStatusAuthorized, nil
 		},
 	}
 	coordinator := newReadinessCoordinator(readinessCoordinatorConfig{
-		Agents: []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", agent)},
+		Agents: []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", agent)},
 	})
 	returned := make(chan struct{})
 	go func() {
@@ -776,7 +776,7 @@ func TestReadinessCoordinatorFindInstalledIsBoundedAndDoesNotWaitForAuth(t *test
 	defer cancelDaemon()
 	slowRelease := make(chan struct{})
 	installed := &readinessTestAgent{
-		resolve: func(context.Context) (string, error) { return "/bin/codex", nil },
+		resolve: func(context.Context) (string, error) { return "/bin/opencode", nil },
 		auth: func(context.Context) (ports.AgentAuthStatus, error) {
 			<-slowRelease
 			return ports.AgentAuthStatusAuthorized, nil
@@ -795,7 +795,7 @@ func TestReadinessCoordinatorFindInstalledIsBoundedAndDoesNotWaitForAuth(t *test
 	}
 	coordinator := newReadinessCoordinator(readinessCoordinatorConfig{
 		Agents: []agentregistry.HarnessAgent{
-			readinessHarness("codex", "Codex", installed),
+			readinessHarness("opencode", "OpenCode", installed),
 			readinessHarness("slow", "Slow", slow),
 		},
 		Context: daemonCtx,
@@ -803,8 +803,8 @@ func TestReadinessCoordinatorFindInstalledIsBoundedAndDoesNotWaitForAuth(t *test
 	})
 
 	found, ok := coordinator.FindInstalled(context.Background(), domain.AgentReadinessPurposeLaunch)
-	if !ok || found.ID != "codex" {
-		t.Fatalf("FindInstalled() = (%#v, %v), want Codex", found, ok)
+	if !ok || found.ID != "opencode" {
+		t.Fatalf("FindInstalled() = (%#v, %v), want OpenCode", found, ok)
 	}
 	if got := installed.authCalls.Load(); got != 0 {
 		t.Fatalf("authentication checks = %d, want none in startup presence path", got)
@@ -866,7 +866,7 @@ func TestReadinessCoordinatorWarmFinishesPresenceBeforeAuthentication(t *testing
 			default:
 				close(installDone)
 			}
-			return "/bin/codex", nil
+			return "/bin/opencode", nil
 		},
 		auth: func(context.Context) (ports.AgentAuthStatus, error) {
 			close(authStarted)
@@ -875,7 +875,7 @@ func TestReadinessCoordinatorWarmFinishesPresenceBeforeAuthentication(t *testing
 		},
 	}
 	coordinator := newReadinessCoordinator(readinessCoordinatorConfig{
-		Agents: []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", agent)},
+		Agents: []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", agent)},
 	})
 	coordinator.Warm()
 	<-installDone
@@ -884,8 +884,8 @@ func TestReadinessCoordinatorWarmFinishesPresenceBeforeAuthentication(t *testing
 	ctx, cancel := context.WithTimeout(context.Background(), 100*time.Millisecond)
 	defer cancel()
 	found, ok := coordinator.FindInstalled(ctx, domain.AgentReadinessPurposeLaunch)
-	if !ok || found.ID != "codex" {
-		t.Fatalf("FindInstalled() while auth is running = (%#v, %v), want cached Codex presence", found, ok)
+	if !ok || found.ID != "opencode" {
+		t.Fatalf("FindInstalled() while auth is running = (%#v, %v), want cached OpenCode presence", found, ok)
 	}
 	close(authRelease)
 }
@@ -893,7 +893,7 @@ func TestReadinessCoordinatorWarmFinishesPresenceBeforeAuthentication(t *testing
 func TestReadinessCoordinatorRejectsInvalidPurposeAndUnknownAgent(t *testing.T) {
 	t.Parallel()
 	coordinator := newReadinessCoordinator(readinessCoordinatorConfig{
-		Agents: []agentregistry.HarnessAgent{readinessHarness("codex", "Codex", &readinessTestAgent{})},
+		Agents: []agentregistry.HarnessAgent{readinessHarness("opencode", "OpenCode", &readinessTestAgent{})},
 	})
 	if _, err := coordinator.Ensure(context.Background(), nil, domain.AgentReadinessPurpose("force")); err == nil {
 		t.Fatal("invalid purpose error = nil")

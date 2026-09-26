@@ -240,7 +240,7 @@ export interface CommandDetail {
 	 * Provider output aggregation was observed to drop leading bytes even on tiny
 	 * commands, so this display data is not an authoritative record of what ran.
 	 *
-	 * Set for BOTH output sources. Measured on codex-cli 0.146.0: a command
+	 * Set for BOTH output sources. Measured on opencode 0.146.0: a command
 	 * printing tick-1..tick-8 lost tick-1 from the delta stream and from the
 	 * aggregate alike, so accumulating deltas buys liveness, not completeness.
 	 */

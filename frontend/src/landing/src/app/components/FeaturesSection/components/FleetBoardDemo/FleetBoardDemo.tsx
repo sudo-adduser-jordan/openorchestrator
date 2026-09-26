@@ -128,14 +128,14 @@ const INITIAL_CARDS: Card[] = [
 	},
 	{
 		id: "c3", title: "Run integration tests on webhook handler",
-		branch: "webhooks/integration-tests", icon: "/app-icons/coverage-codex.svg",
+		branch: "webhooks/integration-tests", icon: "/app-icons/coverage-opencode.svg",
 		column: "staging", activity: "Running tests", activityState: "running",
 		pr: "draft", time: "22m ago",
 		testResults: { pass: 18, total: 50 },
 	},
 	{
 		id: "c4", title: "Migrate auth tokens to short-lived JWTs",
-		branch: "auth/jwt-rotation", icon: "/app-icons/coverage-codex.svg",
+		branch: "auth/jwt-rotation", icon: "/app-icons/coverage-opencode.svg",
 		column: "staging", activity: "Building...", activityState: "running",
 		pr: "PR #331", time: "34m ago",
 		testResults: { pass: 22, total: 60 },
@@ -486,7 +486,7 @@ export function FleetBoardDemo() {
 					const newId = `spawned-${++incomingIdx.current}`;
 					const templates = [
 						{ title: "Throttle agent spawn rate under load",      branch: "backend/spawn-throttle",      icon: "/app-icons/coverage-opencode.svg" },
-						{ title: "Add keyboard shortcut for session focus",    branch: "feat/session-focus-shortcut", icon: "/app-icons/coverage-codex.svg"       },
+						{ title: "Add keyboard shortcut for session focus",    branch: "feat/session-focus-shortcut", icon: "/app-icons/coverage-opencode.svg"       },
 						{ title: "Lazy-load session terminal on first open",   branch: "perf/lazy-terminal",          icon: "/app-icons/agents/cursor.svg"               },
 						{ title: "Fix memory leak in terminal resize handler", branch: "fix/terminal-resize-leak",    icon: "/app-icons/coverage-opencode.svg" },
 						{ title: "Migrate auth tokens to short-lived JWTs",   branch: "auth/jwt-rotation",           icon: "/app-icons/opencode.svg"             },

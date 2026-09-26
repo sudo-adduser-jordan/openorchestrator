@@ -34,7 +34,6 @@ type ControlDeps struct {
 //	RequestID     → attach a request id for correlation
 //	requestLogger → slog-backed access log, carries the request id
 //	recoverPanics → turn a handler panic into 500 instead of crashing the daemon
-//	accountOrigin → exact renderer-origin boundary for Codex account management
 //	cors          → CORS allowlist for the Electron renderer / dev origins
 //
 // The per-request timeout is deliberately not global: it wraps only bounded

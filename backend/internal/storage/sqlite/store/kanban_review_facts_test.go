@@ -23,13 +23,13 @@ func TestListCurrentHeadReviewRunsForSessionDropsStaleSHAs(t *testing.T) {
 	}, nil, nil, nil, nil, ports.ReviewWritePreserve); err != nil {
 		t.Fatal(err)
 	}
-	if err := s.UpsertReview(ctx, domain.Review{ID: "rev", SessionID: r.ID, ProjectID: "mer", Harness: "codex", PRURL: "pr/1", CreatedAt: now, UpdatedAt: now}); err != nil {
+	if err := s.UpsertReview(ctx, domain.Review{ID: "rev", SessionID: r.ID, ProjectID: "mer", Harness: "opencode", PRURL: "pr/1", CreatedAt: now, UpdatedAt: now}); err != nil {
 		t.Fatal(err)
 	}
 	insert := func(id, sha string, status domain.ReviewRunStatus, verdict domain.ReviewVerdict) {
 		t.Helper()
 		if err := s.InsertReviewRun(ctx, domain.ReviewRun{
-			ID: id, ReviewID: "rev", SessionID: r.ID, Harness: "codex",
+			ID: id, ReviewID: "rev", SessionID: r.ID, Harness: "opencode",
 			PRURL: "pr/1", TargetSHA: sha, Status: status, Verdict: verdict, CreatedAt: now,
 		}); err != nil {
 			t.Fatalf("insert %s: %v", id, err)
@@ -80,7 +80,7 @@ func TestListCurrentHeadReviewRunsForSessionKeepsLatestRunPerHarness(t *testing.
 		}
 	}
 	insert("old", "opencode", now, domain.VerdictChangesRequested)
-	insert("other", "codex", now.Add(time.Second), domain.VerdictApproved)
+	insert("other", "opencode", now.Add(time.Second), domain.VerdictApproved)
 	insert("new", "opencode", now.Add(2*time.Second), domain.VerdictApproved)
 
 	runs, err := s.ListCurrentHeadReviewRunsForSession(ctx, r.ID)
@@ -95,7 +95,7 @@ func TestListCurrentHeadReviewRunsForSessionKeepsLatestRunPerHarness(t *testing.
 	for _, run := range runs {
 		byHarness[run.Harness] = run.Verdict
 	}
-	if byHarness["opencode"] != domain.VerdictApproved || byHarness["codex"] != domain.VerdictApproved {
+	if byHarness["opencode"] != domain.VerdictApproved || byHarness["opencode"] != domain.VerdictApproved {
 		t.Fatalf("runs = %+v, want latest approved run per harness", runs)
 	}
 }
@@ -126,11 +126,11 @@ func TestListPRFactsForSessionSplitsExternalReviewVerdicts(t *testing.T) {
 	write("pr/human", []domain.PullRequestReview{{ID: "gh-human", Author: "maintainer", State: domain.ReviewChangesRequest, SubmittedAt: now}})
 
 	// Open Agents's own provider review, recorded by id on its review run.
-	if err := s.UpsertReview(ctx, domain.Review{ID: "rev", SessionID: r.ID, ProjectID: "mer", Harness: "codex", PRURL: "pr/open-agents-only", CreatedAt: now, UpdatedAt: now}); err != nil {
+	if err := s.UpsertReview(ctx, domain.Review{ID: "rev", SessionID: r.ID, ProjectID: "mer", Harness: "opencode", PRURL: "pr/open-agents-only", CreatedAt: now, UpdatedAt: now}); err != nil {
 		t.Fatal(err)
 	}
 	if err := s.InsertReviewRun(ctx, domain.ReviewRun{
-		ID: "run", ReviewID: "rev", SessionID: r.ID, Harness: "codex", PRURL: "pr/open-agents-only",
+		ID: "run", ReviewID: "rev", SessionID: r.ID, Harness: "opencode", PRURL: "pr/open-agents-only",
 		TargetSHA: "head1", Status: domain.ReviewRunComplete, Verdict: domain.VerdictApproved,
 		GithubReviewID: "gh-open-agents", CreatedAt: now,
 	}); err != nil {
@@ -227,11 +227,11 @@ func TestListPRFactsForSessionKeepsHumanVerdictOverLaterOpenAgentsReview(t *test
 	}, nil, nil, ports.ReviewWriteReplace); err != nil {
 		t.Fatal(err)
 	}
-	if err := s.UpsertReview(ctx, domain.Review{ID: "rev", SessionID: r.ID, ProjectID: "mer", Harness: "codex", PRURL: "pr/1", CreatedAt: now, UpdatedAt: now}); err != nil {
+	if err := s.UpsertReview(ctx, domain.Review{ID: "rev", SessionID: r.ID, ProjectID: "mer", Harness: "opencode", PRURL: "pr/1", CreatedAt: now, UpdatedAt: now}); err != nil {
 		t.Fatal(err)
 	}
 	if err := s.InsertReviewRun(ctx, domain.ReviewRun{
-		ID: "run", ReviewID: "rev", SessionID: r.ID, Harness: "codex", PRURL: "pr/1",
+		ID: "run", ReviewID: "rev", SessionID: r.ID, Harness: "opencode", PRURL: "pr/1",
 		TargetSHA: "head1", Status: domain.ReviewRunComplete, Verdict: domain.VerdictApproved,
 		GithubReviewID: "gh-open-agents", CreatedAt: now,
 	}); err != nil {
@@ -258,13 +258,13 @@ func TestListPRFactsForSessionSplitsExternalCommentsFromOpenAgentsInjectedCommen
 	now := time.Now().UTC().Truncate(time.Second)
 
 	if err := s.UpsertReview(ctx, domain.Review{
-		ID: "rev-open-agents", SessionID: r.ID, ProjectID: "mer", Harness: "codex",
+		ID: "rev-open-agents", SessionID: r.ID, ProjectID: "mer", Harness: "opencode",
 		PRURL: "pr/open-agents", CreatedAt: now, UpdatedAt: now,
 	}); err != nil {
 		t.Fatal(err)
 	}
 	if err := s.InsertReviewRun(ctx, domain.ReviewRun{
-		ID: "run-open-agents", ReviewID: "rev-open-agents", SessionID: r.ID, Harness: "codex",
+		ID: "run-open-agents", ReviewID: "rev-open-agents", SessionID: r.ID, Harness: "opencode",
 		PRURL: "pr/open-agents", TargetSHA: "head1", Status: domain.ReviewRunComplete,
 		Verdict: domain.VerdictChangesRequested, GithubReviewID: "gh-open-agents", CreatedAt: now,
 	}); err != nil {
@@ -399,7 +399,7 @@ func TestListCurrentHeadReviewRunsForSessionsKeepsLatestRunPerHarness(t *testing
 		}
 	}
 	insert("run-old", first.ID, "rev-"+string(first.ID), "opencode", now, domain.VerdictChangesRequested)
-	insert("run-new", first.ID, "rev-"+string(first.ID), "codex", now.Add(time.Second), domain.VerdictApproved)
+	insert("run-new", first.ID, "rev-"+string(first.ID), "opencode", now.Add(time.Second), domain.VerdictApproved)
 	insert("run-other", first.ID, "rev-"+string(first.ID), "opencode", now.Add(2*time.Second), domain.VerdictApproved)
 	insert("run-second", second.ID, "rev-"+string(second.ID), "opencode", now, domain.VerdictApproved)
 
@@ -418,7 +418,7 @@ func TestListCurrentHeadReviewRunsForSessionsKeepsLatestRunPerHarness(t *testing
 		}
 		byHarness[run.Harness] = run.Verdict
 	}
-	if byHarness["opencode"] != domain.VerdictApproved || byHarness["codex"] != domain.VerdictApproved {
+	if byHarness["opencode"] != domain.VerdictApproved || byHarness["opencode"] != domain.VerdictApproved {
 		t.Fatalf("first session runs = %+v, want latest per harness", got[first.ID])
 	}
 	if got[second.ID][0].Verdict != domain.VerdictApproved {
@@ -495,13 +495,13 @@ func TestListPRFactsForSessionsSplitExternalCommentsFromOpenAgentsInjectedCommen
 		t.Fatal(err)
 	}
 	if err := s.UpsertReview(ctx, domain.Review{
-		ID: "rev-open-agents", SessionID: third.ID, ProjectID: "mer", Harness: "codex",
+		ID: "rev-open-agents", SessionID: third.ID, ProjectID: "mer", Harness: "opencode",
 		PRURL: "pr/open-agents", CreatedAt: now, UpdatedAt: now,
 	}); err != nil {
 		t.Fatal(err)
 	}
 	if err := s.InsertReviewRun(ctx, domain.ReviewRun{
-		ID: "run-open-agents", ReviewID: "rev-open-agents", SessionID: third.ID, Harness: "codex",
+		ID: "run-open-agents", ReviewID: "rev-open-agents", SessionID: third.ID, Harness: "opencode",
 		PRURL: "pr/open-agents", TargetSHA: "head1", Status: domain.ReviewRunComplete,
 		Verdict: domain.VerdictChangesRequested, GithubReviewID: "gh-open-agents", CreatedAt: now,
 	}); err != nil {

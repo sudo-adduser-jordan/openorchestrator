@@ -1148,7 +1148,7 @@ func TestSetProviderTitleIsRecordedIndependentlyOfTheLabel(t *testing.T) {
 	if renamed, err := s.RenameSession(ctx, session, "Mine", histClock); err != nil || !renamed {
 		t.Fatalf("rename: renamed=%v err=%v", renamed, err)
 	}
-	if err := s.SetProviderTitle(ctx, conversation, "What Codex Calls It", histClock); err != nil {
+	if err := s.SetProviderTitle(ctx, conversation, "What OpenCode Calls It", histClock); err != nil {
 		t.Fatalf("SetProviderTitle: %v", err)
 	}
 
@@ -1156,7 +1156,7 @@ func TestSetProviderTitleIsRecordedIndependentlyOfTheLabel(t *testing.T) {
 	if err != nil {
 		t.Fatalf("load snapshot: %v", err)
 	}
-	if snapshot.Conversation.ProviderTitle != "What Codex Calls It" {
+	if snapshot.Conversation.ProviderTitle != "What OpenCode Calls It" {
 		t.Errorf("provider title = %q, want it kept even though the label is the user's",
 			snapshot.Conversation.ProviderTitle)
 	}

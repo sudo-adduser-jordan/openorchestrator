@@ -113,7 +113,7 @@ func sessionJSON(id, project, kind, status string, terminated bool) string {
 		"id":           id,
 		"projectId":    project,
 		"kind":         kind,
-		"harness":      "codex",
+		"harness":      "opencode",
 		"displayName":  "Current Name",
 		"activity":     map[string]any{"state": "idle", "lastActivityAt": "2026-06-02T12:00:00Z"},
 		"isTerminated": terminated,

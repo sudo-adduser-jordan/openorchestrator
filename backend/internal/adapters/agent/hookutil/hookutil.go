@@ -1,5 +1,5 @@
 // Package hookutil holds small filesystem helpers shared by the agent hook
-// installers (codex, opencode). It centralizes the atomic-write
+// installers. It centralizes the atomic-write
 // primitive so every adapter writes hook config the same crash-safe way.
 package hookutil
 

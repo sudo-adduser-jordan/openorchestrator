@@ -23,7 +23,7 @@ export function buildLlmsHeader(): string[] {
 		"",
 		"> Open-source desktop application and local CLI (`open-agents`) to run 10+ parallel AI coding agents in isolated Git worktrees without file conflicts or API proxying.",
 		"",
-		`${COMPANY.NAME} is an open-source desktop application that lets developers run multiple AI coding agents in parallel, each in its own isolated Git worktree. It works with any CLI-based agent including OpenCode and OpenAI Codex. Agents can work on different branches or features simultaneously without conflicts. ${COMPANY.NAME} is free, does not proxy API calls, and supports macOS, Windows, and Linux.`,
+		`${COMPANY.NAME} is an open-source desktop application that lets developers run multiple AI coding agents in parallel, each in its own isolated Git worktree. It works with any CLI-based agent including OpenCode and OpenAI OpenCode. Agents can work on different branches or features simultaneously without conflicts. ${COMPANY.NAME} is free, does not proxy API calls, and supports macOS, Windows, and Linux.`,
 	];
 }
 
@@ -41,7 +41,7 @@ export function buildWhenToUseSection(
 		"",
 		"Reach for Open Agents when you need to:",
 		"",
-		"- Run several coding agents (Codex, OpenCode, or any CLI agent) at the same time on one repository without them stepping on each other, each agent gets an isolated Git worktree and its own branch.",
+		"- Run several coding agents (OpenCode, OpenCode, or any CLI agent) at the same time on one repository without them stepping on each other, each agent gets an isolated Git worktree and its own branch.",
 		"- Orchestrate agent work through the desktop app and local `open-agents` CLI: create workspaces, launch agents with a prompt, open terminals, and track tasks.",
 		"- Schedule recurring agent runs (automations) that execute a prompt on a cron-like schedule in a fresh or existing workspace.",
 		"- Automatically route CI failures and review feedback to the agent session that owns the branch, so the right agent can handle failures without manual babysitting.",

@@ -68,7 +68,7 @@ func (s *Service) withoutInheritedHistory(ctx context.Context, provider ports.Ch
 
 func omitCopiedPrefix(events, mapped []ports.ChatEvent, rows ConversationRows) []ports.ChatEvent {
 	// Approval/input records belong to Open Agents's interaction history, not the native
-	// transcript. Keep those rows, but do not require Codex to replay them.
+	// transcript. Keep those rows, but do not require opencode to replay them.
 	activities := make([]domain.ConversationActivity, 0, len(rows.Activities))
 	for _, activity := range rows.Activities {
 		if activity.Kind != domain.ActivityKindApproval && activity.Kind != domain.ActivityKindUserInput {
@@ -84,7 +84,7 @@ func omitCopiedPrefix(events, mapped []ports.ChatEvent, rows ConversationRows) [
 	messages, replayActivities := map[string]int{}, map[string]int{}
 	ambiguous := false
 	for i, event := range mapped {
-		// Codex may omit item IDs in persisted history. Its native turn identity
+		// opencode may omit item IDs in persisted history. Its native turn identity
 		// still proves the candidate; complete content must match below as well.
 		if matched := index.byProviderTurnID[event.ProviderTurnID]; matched != nil {
 			if candidate != nil && matched != candidate {

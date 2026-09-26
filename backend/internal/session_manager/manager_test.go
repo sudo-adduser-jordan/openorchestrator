@@ -730,7 +730,7 @@ type scratchHookAgent struct {
 }
 
 func (a *scratchHookAgent) GetAgentHooks(_ context.Context, cfg ports.WorkspaceHookConfig) error {
-	dir := filepath.Join(cfg.WorkspacePath, ".codex")
+	dir := filepath.Join(cfg.WorkspacePath, ".opencode")
 	if err := os.MkdirAll(dir, 0o750); err != nil {
 		return err
 	}
@@ -1595,7 +1595,7 @@ func TestSpawn_DropsRoleModelOnHarnessMismatch(t *testing.T) {
 			})
 
 			rec, _, _, err := m.Spawn(ctx, ports.SpawnConfig{
-				ProjectID: "mer", Kind: tc.kind, Harness: domain.AgentHarness("codex"),
+				ProjectID: "mer", Kind: tc.kind, Harness: domain.AgentHarness("opencode"),
 			})
 			if err != nil {
 				t.Fatal(err)
@@ -1709,7 +1709,7 @@ func TestSpawn_WrapsSupervisedAgentAndPersistsGeneration(t *testing.T) {
 	st := newFakeStore()
 	st.projects["mer"] = domain.ProjectRecord{ID: "mer", Config: testRoleAgents()}
 	rt := &fakeRuntime{}
-	agent := supervisedLaunchAgent{launchArgvAgent{argv: []string{"codex", "--model", "gpt-5"}}}
+	agent := supervisedLaunchAgent{launchArgvAgent{argv: []string{"opencode", "--model", "gpt-5"}}}
 	m := New(Deps{
 		Runtime: rt, Agents: singleAgent{agent: agent}, Workspace: &fakeWorkspace{}, Store: st,
 		Messenger: &fakeMessenger{}, Lifecycle: &fakeLCM{store: st},
@@ -1722,7 +1722,7 @@ func TestSpawn_WrapsSupervisedAgentAndPersistsGeneration(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	wantArgv := []string{"/opt/open-agents", "agent-process", "supervise", "--session", "mer-1", "--launch", "launch-7", "--", "codex", "--model", "gpt-5"}
+	wantArgv := []string{"/opt/open-agents", "agent-process", "supervise", "--session", "mer-1", "--launch", "launch-7", "--", "opencode", "--model", "gpt-5"}
 	if !reflect.DeepEqual(rt.lastCfg.Argv, wantArgv) {
 		t.Fatalf("runtime argv = %#v, want %#v", rt.lastCfg.Argv, wantArgv)
 	}
@@ -1743,7 +1743,7 @@ func TestRestore_RotatesSupervisedAgentGeneration(t *testing.T) {
 	rec.Harness = domain.HarnessOpenCode
 	st.sessions["mer-1"] = rec
 	rt := &fakeRuntime{}
-	agent := supervisedLaunchAgent{launchArgvAgent{argv: []string{"codex", "resume", "agent-x"}}}
+	agent := supervisedLaunchAgent{launchArgvAgent{argv: []string{"opencode", "resume", "agent-x"}}}
 	m := New(Deps{
 		Runtime: rt, Agents: singleAgent{agent: agent}, Workspace: &fakeWorkspace{}, Store: st,
 		Messenger: &fakeMessenger{}, Lifecycle: &fakeLCM{store: st},
@@ -1765,7 +1765,7 @@ func TestRestore_RotatesSupervisedAgentGeneration(t *testing.T) {
 	if got := rt.lastCfg.Env[EnvRuntimeLaunchID]; got != "launch-new" {
 		t.Fatalf("restored launch env = %q, want launch-new", got)
 	}
-	wantArgv := []string{"/opt/open-agents", "agent-process", "supervise", "--session", "mer-1", "--launch", "launch-new", "--", "codex", "resume", "agent-x"}
+	wantArgv := []string{"/opt/open-agents", "agent-process", "supervise", "--session", "mer-1", "--launch", "launch-new", "--", "opencode", "resume", "agent-x"}
 	if !reflect.DeepEqual(rt.lastCfg.Argv, wantArgv) {
 		t.Fatalf("restored runtime argv = %#v, want %#v", rt.lastCfg.Argv, wantArgv)
 	}
@@ -1841,7 +1841,7 @@ func TestResumeAgent_RestartsRuntimeWithManagedGeneration(t *testing.T) {
 	t.Parallel()
 	baseRuntime := &fakeRuntime{aliveByHandle: map[string]bool{"tmux-mer-1": true}}
 	runtime := &fakeRestartRuntime{fakeRuntime: baseRuntime}
-	agent := supervisedLaunchAgent{launchArgvAgent{argv: []string{"codex", "resume", "agent-x"}}}
+	agent := supervisedLaunchAgent{launchArgvAgent{argv: []string{"opencode", "resume", "agent-x"}}}
 	m, st, ws := newExitedResumeManager(t, runtime, agent)
 	lcm := m.lcm.(*fakeLCM)
 	runtime.onRestart = func() {
@@ -1863,7 +1863,7 @@ func TestResumeAgent_RestartsRuntimeWithManagedGeneration(t *testing.T) {
 	if ws.lastCfg.SessionID != "" || len(ws.calls) != 0 {
 		t.Fatalf("resume should not restore or recreate workspace: cfg=%+v calls=%v", ws.lastCfg, ws.calls)
 	}
-	wantArgv := []string{"/opt/open-agents", "agent-process", "supervise", "--session", "mer-1", "--launch", "launch-new", "--", "codex", "resume", "agent-x"}
+	wantArgv := []string{"/opt/open-agents", "agent-process", "supervise", "--session", "mer-1", "--launch", "launch-new", "--", "opencode", "resume", "agent-x"}
 	if !reflect.DeepEqual(baseRuntime.lastCfg.Argv, wantArgv) {
 		t.Fatalf("resumed runtime argv = %#v, want %#v", baseRuntime.lastCfg.Argv, wantArgv)
 	}
@@ -1878,7 +1878,7 @@ func TestResumeAgent_RestartsRuntimeWithManagedGeneration(t *testing.T) {
 		t.Fatalf("resumed metadata = %+v", got.Metadata)
 	}
 	if got.Metadata.AgentSessionIDLaunchID != "launch-new" {
-		t.Fatalf("native Codex resume identity launch = %q, want launch-new", got.Metadata.AgentSessionIDLaunchID)
+		t.Fatalf("native OpenCode resume identity launch = %q, want launch-new", got.Metadata.AgentSessionIDLaunchID)
 	}
 	if result.Mode != RestoreModeNative {
 		t.Fatalf("resume mode = %q, want native", result.Mode)
@@ -1891,7 +1891,7 @@ func TestResumeAgent_RestartsRuntimeWithManagedGeneration(t *testing.T) {
 func TestResumeAgent_FallsBackToRuntimeRecreateWithoutRestartCapability(t *testing.T) {
 	t.Parallel()
 	runtime := &fakeRuntime{aliveByHandle: map[string]bool{"tmux-mer-1": true}}
-	agent := supervisedLaunchAgent{launchArgvAgent{argv: []string{"codex", "resume", "agent-x"}}}
+	agent := supervisedLaunchAgent{launchArgvAgent{argv: []string{"opencode", "resume", "agent-x"}}}
 	m, st, _ := newExitedResumeManager(t, runtime, agent)
 
 	if _, err := m.ResumeAgentWithMode(ctx, "mer-1"); err != nil {
@@ -1908,7 +1908,7 @@ func TestResumeAgent_FallsBackToRuntimeRecreateWithoutRestartCapability(t *testi
 func TestResumeAgent_RequiresLiveExitedSession(t *testing.T) {
 	t.Parallel()
 	runtime := &fakeRuntime{aliveByHandle: map[string]bool{"tmux-mer-1": true}}
-	agent := supervisedLaunchAgent{launchArgvAgent{argv: []string{"codex", "resume", "agent-x"}}}
+	agent := supervisedLaunchAgent{launchArgvAgent{argv: []string{"opencode", "resume", "agent-x"}}}
 	m, st, _ := newExitedResumeManager(t, runtime, agent)
 
 	rec := st.sessions["mer-1"]
@@ -1933,7 +1933,7 @@ func TestResumeAgent_RestartFailureLeavesSessionExited(t *testing.T) {
 	t.Parallel()
 	baseRuntime := &fakeRuntime{aliveByHandle: map[string]bool{"tmux-mer-1": true}}
 	runtime := &fakeRestartRuntime{fakeRuntime: baseRuntime, restartErr: errors.New("respawn failed")}
-	agent := supervisedLaunchAgent{launchArgvAgent{argv: []string{"codex", "resume", "agent-x"}}}
+	agent := supervisedLaunchAgent{launchArgvAgent{argv: []string{"opencode", "resume", "agent-x"}}}
 	m, st, _ := newExitedResumeManager(t, runtime, agent)
 	lcm := m.lcm.(*fakeLCM)
 
@@ -1957,7 +1957,7 @@ func TestResumeAgent_RejectsConcurrentRequest(t *testing.T) {
 		entered:     make(chan struct{}),
 		release:     make(chan struct{}),
 	}
-	agent := supervisedLaunchAgent{launchArgvAgent{argv: []string{"codex", "resume", "agent-x"}}}
+	agent := supervisedLaunchAgent{launchArgvAgent{argv: []string{"opencode", "resume", "agent-x"}}}
 	m, _, _ := newExitedResumeManager(t, runtime, agent)
 	firstDone := make(chan error, 1)
 	go func() {
@@ -1999,7 +1999,7 @@ func TestResumeAgent_ReleasesInputGateAfterInterfaceTransitionRejection(t *testi
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			runtime := &fakeRuntime{aliveByHandle: map[string]bool{"tmux-mer-1": true}}
-			agent := supervisedLaunchAgent{launchArgvAgent{argv: []string{"codex", "resume", "agent-x"}}}
+			agent := supervisedLaunchAgent{launchArgvAgent{argv: []string{"opencode", "resume", "agent-x"}}}
 			manager, store, _ := newExitedResumeManager(t, runtime, agent)
 			transitionStore := newTransitionStore()
 			transitionStore.projects = store.projects
@@ -5631,7 +5631,7 @@ func TestSpawn_MissingBinaryPreservesNonEmptyScratchWorkspaceForRetry(t *testing
 	if failed.Metadata.WorkspacePath == "" {
 		t.Fatal("failed scratch spawn must retain its preserved workspace path")
 	}
-	if _, err := os.Stat(filepath.Join(failed.Metadata.WorkspacePath, ".codex", "settings.local.json")); err != nil {
+	if _, err := os.Stat(filepath.Join(failed.Metadata.WorkspacePath, ".opencode", "settings.local.json")); err != nil {
 		t.Fatalf("preserved hook file: %v", err)
 	}
 
@@ -5741,7 +5741,7 @@ func TestSpawn_AfterStartFailurePreservesNonEmptyScratchWorkspace(t *testing.T) 
 	if runtime.created != 1 || runtime.destroyed != 1 {
 		t.Fatalf("runtime created=%d destroyed=%d, want 1/1", runtime.created, runtime.destroyed)
 	}
-	if _, err := os.Stat(filepath.Join(failed.Metadata.WorkspacePath, ".codex", "settings.local.json")); err != nil {
+	if _, err := os.Stat(filepath.Join(failed.Metadata.WorkspacePath, ".opencode", "settings.local.json")); err != nil {
 		t.Fatalf("preserved hook file: %v", err)
 	}
 }
@@ -8740,7 +8740,7 @@ func TestSend_SkipsConfirmForHooklessHarness(t *testing.T) {
 	// fakeAgent) must skip confirmActive entirely: one Send, no nudges, and the
 	// call returns immediately without polling.
 	st := newFakeStore()
-	st.sessions["s1"] = pastStartupGate(domain.SessionRecord{ID: "s1", Harness: "codex"})
+	st.sessions["s1"] = pastStartupGate(domain.SessionRecord{ID: "s1", Harness: "opencode"})
 	msg := &fakeMessenger{}
 	m := newSendTestManager(t, fakeAgent{}, msg, st)
 
@@ -8760,7 +8760,7 @@ func TestSend_SkipsConfirmForHooklessHarness(t *testing.T) {
 func TestSend_RecordsDeliveredUserInput(t *testing.T) {
 	t.Parallel()
 	st := newFakeStore()
-	st.sessions["s1"] = pastStartupGate(domain.SessionRecord{ID: "s1", Harness: "codex"})
+	st.sessions["s1"] = pastStartupGate(domain.SessionRecord{ID: "s1", Harness: "opencode"})
 	m := newSendTestManager(t, fakeAgent{}, &fakeMessenger{}, st)
 
 	if err := m.Send(context.Background(), "s1", "continue with the migration", nil); err != nil {
@@ -9147,7 +9147,7 @@ func TestSend_ConfirmsAndNudgesUntilActive(t *testing.T) {
 	// flip the session active, after which confirmActive stops. Net: the
 	// initial message plus exactly one nudge.
 	st := newFakeStore()
-	st.sessions["s1"] = pastStartupGate(domain.SessionRecord{ID: "s1", Harness: "codex",
+	st.sessions["s1"] = pastStartupGate(domain.SessionRecord{ID: "s1", Harness: "opencode",
 		Activity: domain.Activity{State: domain.ActivityIdle}})
 	// A messenger that flips the session active on the first Enter-only nudge,
 	// mimicking the agent accepting the prompt.
@@ -9176,7 +9176,7 @@ func TestSend_ConfirmBudgetCapsRetries(t *testing.T) {
 	// A signaling harness that never goes active must still terminate: at most
 	// maxAttempts Sends (initial + maxAttempts-1 nudges), and Send never errors.
 	st := newFakeStore()
-	st.sessions["s1"] = pastStartupGate(domain.SessionRecord{ID: "s1", Harness: "codex",
+	st.sessions["s1"] = pastStartupGate(domain.SessionRecord{ID: "s1", Harness: "opencode",
 		Activity: domain.Activity{State: domain.ActivityIdle}})
 	msg := &fakeMessenger{}
 	m := newSendTestManager(t, signalingAgent{}, msg, st)
@@ -9208,7 +9208,7 @@ func TestSend_BlockedSessionRejectsDelivery(t *testing.T) {
 	// Send surfaces ErrAwaitingDecision (the API's 409) and the messenger is
 	// never called, so nothing — message or nudge — reaches the pane.
 	st := newFakeStore()
-	st.sessions["s1"] = pastStartupGate(domain.SessionRecord{ID: "s1", Harness: "codex",
+	st.sessions["s1"] = pastStartupGate(domain.SessionRecord{ID: "s1", Harness: "opencode",
 		Activity: domain.Activity{State: domain.ActivityBlocked}})
 	msg := &fakeMessenger{}
 	m := newSendTestManager(t, signalingAgent{}, msg, st)
@@ -9225,7 +9225,7 @@ func TestSend_BlockedSessionRejectsDelivery(t *testing.T) {
 func TestSend_ExitedAgentRejectsDelivery(t *testing.T) {
 	t.Parallel()
 	st := newFakeStore()
-	st.sessions["s1"] = domain.SessionRecord{ID: "s1", Harness: "codex",
+	st.sessions["s1"] = domain.SessionRecord{ID: "s1", Harness: "opencode",
 		Activity: domain.Activity{State: domain.ActivityExited}}
 	msg := &fakeMessenger{}
 	m := newSendTestManager(t, signalingAgent{}, msg, st)
@@ -9284,7 +9284,7 @@ func TestSend_NoNudgeWhenBlockedAppearsMidWait(t *testing.T) {
 	// itself triggered a tool approval). The confirm loop must abort on the
 	// first blocked observation instead of nudging after the deadline.
 	st := newFakeStore()
-	st.sessions["s1"] = pastStartupGate(domain.SessionRecord{ID: "s1", Harness: "codex",
+	st.sessions["s1"] = pastStartupGate(domain.SessionRecord{ID: "s1", Harness: "opencode",
 		Activity: domain.Activity{State: domain.ActivityIdle}})
 	msg := &blockOnSendMessenger{sessionID: "s1", store: st}
 	m := newSendTestManager(t, signalingAgent{}, msg, st)
@@ -9303,7 +9303,7 @@ func TestSend_StillNudgesWhenWaitingInput(t *testing.T) {
 	// PRIMARY nudge scenario: a long-idle worker with an unsubmitted pasted
 	// draft. The decision-safety guard must not disable it.
 	st := newFakeStore()
-	st.sessions["s1"] = pastStartupGate(domain.SessionRecord{ID: "s1", Harness: "codex",
+	st.sessions["s1"] = pastStartupGate(domain.SessionRecord{ID: "s1", Harness: "opencode",
 		Activity: domain.Activity{State: domain.ActivityWaitingInput}})
 	msg := &flipOnNudgeMessenger{sessionID: "s1", store: st}
 	m := newSendTestManager(t, signalingAgent{}, msg, st)
@@ -9344,7 +9344,7 @@ func TestSend_NoNudgeWhenBlockedAppearsBeforeNudge(t *testing.T) {
 	// before the Enter-only nudge. The just-in-time re-read in confirmActive
 	// must catch it — exactly one Send, no nudge.
 	st := newFakeStore()
-	st.sessions["s1"] = pastStartupGate(domain.SessionRecord{ID: "s1", Harness: "codex",
+	st.sessions["s1"] = pastStartupGate(domain.SessionRecord{ID: "s1", Harness: "opencode",
 		Activity: domain.Activity{State: domain.ActivityIdle}})
 	// blockAfterFirstReadStore flips the session to blocked on read #4. The
 	// deterministic read sequence (attemptDeadline 0 makes waitForActive do
@@ -9394,19 +9394,19 @@ func TestSend_SkipsConfirmForSubmitOnlyHarness(t *testing.T) {
 func TestHarnessNudgeSafe(t *testing.T) {
 	t.Parallel()
 	m := New(Deps{Agents: singleAgent{agent: fakeAgent{}}})
-	if m.harnessNudgeSafe("codex") {
+	if m.harnessNudgeSafe("opencode") {
 		t.Fatalf("hookless agent reported as nudge-safe")
 	}
 	m2 := New(Deps{Agents: singleAgent{agent: signalingAgent{}}})
-	if !m2.harnessNudgeSafe("codex") {
+	if !m2.harnessNudgeSafe("opencode") {
 		t.Fatalf("submit+blocked agent not reported as nudge-safe")
 	}
 	m3 := New(Deps{Agents: singleAgent{agent: submitOnlyAgent{}}})
-	if m3.harnessNudgeSafe("codex") {
+	if m3.harnessNudgeSafe("opencode") {
 		t.Fatalf("submit-only agent (no blocked signal) reported as nudge-safe")
 	}
 	m4 := New(Deps{Agents: missingAgents{}})
-	if m4.harnessNudgeSafe("codex") {
+	if m4.harnessNudgeSafe("opencode") {
 		t.Fatalf("unresolved harness reported as nudge-safe")
 	}
 }

@@ -15,7 +15,7 @@ import (
 	"github.com/sudo-adduser-jordan/open-agents/backend/internal/storage/sqlite/store"
 )
 
-// Models the real Codex termination order: detaching the transport stops the
+// Models the real OpenCode termination order: detaching the transport stops the
 // controller's event stream; a failed authenticated shutdown leaves the provider
 // process alive with its original, immutable environment.
 type shutdownRefusingHost struct {
@@ -65,7 +65,7 @@ func TestFailedBranchShutdownPreservesSurvivingHostCredentials(t *testing.T) {
 			if cfg.ProviderConversationID != "thread-1" {
 				return nil, fmt.Errorf("unexpected resume %s", cfg.ProviderConversationID)
 			}
-			// The real Codex Resume reconnected path reuses the host without
+			// The real OpenCode Resume reconnected path reuses the host without
 			// applying cfg.Env or issuing thread/resume. Preserve its old token.
 			return reattached, nil
 		},

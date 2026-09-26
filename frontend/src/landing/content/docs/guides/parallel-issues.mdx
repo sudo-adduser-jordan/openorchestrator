@@ -14,7 +14,7 @@ Choose a project, create a new task, give it a short display name, then select t
 ```bash
 open-agents spawn --project web --name issue-42 --issue 42 --mode chat
 open-agents spawn --project web --name issue-43 --issue 43 --mode tui
-open-agents spawn --project api --name auth-fix --prompt "Fix token refresh" --harness codex
+open-agents spawn --project api --name auth-fix --prompt "Fix token refresh" --harness opencode
 ```
 
 `open-agents spawn` accepts flags rather than positional issue identifiers. There is no current `open-agents batch-spawn`; invoke `open-agents spawn` once per task or let a manager create workers.

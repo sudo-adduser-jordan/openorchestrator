@@ -28,7 +28,6 @@ type DelegateTaskInput struct {
 	Brief          string
 	RequestedAgent domain.AgentHarness
 	Model          string
-	Effort         *string
 	ApprovalMode   domain.PermissionMode
 	RequestedMode  domain.SessionMode
 	Attachments    []ports.SpawnAttachment
@@ -61,7 +60,6 @@ func (s *Service) DelegateTask(ctx context.Context, in DelegateTaskInput) (Deleg
 		prompt = ""
 	}
 
-	effort, effortOverride := optionalTuningValue(in.Effort)
 	worker, _, _, err := s.manager.Spawn(ctx, ports.SpawnConfig{
 		ProjectID:             in.ProjectID,
 		Kind:                  domain.KindWorker,
@@ -71,12 +69,10 @@ func (s *Service) DelegateTask(ctx context.Context, in DelegateTaskInput) (Deleg
 		DisplayName:           delegatedTaskDisplayName(in.Brief),
 		AgentConfig: ports.AgentConfig{
 			Model:       strings.TrimSpace(in.Model),
-			Effort:      effort,
 			Permissions: in.ApprovalMode,
 		},
-		EffortOverride: effortOverride,
-		RequestedMode:  in.RequestedMode,
-		Attachments:    in.Attachments,
+		RequestedMode: in.RequestedMode,
+		Attachments:   in.Attachments,
 	})
 	if err != nil {
 		return DelegateTaskOutcome{}, toSpawnAPIError(err)
@@ -89,13 +85,6 @@ func (s *Service) DelegateTask(ctx context.Context, in DelegateTaskInput) (Deleg
 		s.refineDelegatedTaskTitleInBackground(worker.ID, in)
 	}
 	return DelegateTaskOutcome{WorkerID: worker.ID}, nil
-}
-
-func optionalTuningValue(value *string) (string, bool) {
-	if value == nil {
-		return "", false
-	}
-	return strings.TrimSpace(*value), true
 }
 
 func (s *Service) refineDelegatedTaskTitleInBackground(workerID domain.SessionID, in DelegateTaskInput) {

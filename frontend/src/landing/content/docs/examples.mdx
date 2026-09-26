@@ -9,7 +9,7 @@ These examples use capabilities shipped in the current Go daemon and Electron de
 
 1. Add a local GitHub repository in the desktop app.
 2. Create a task named **Fix settings validation**.
-3. Select an installed Chat-capable harness such as Codex or OpenCode.
+3. Select an installed Chat-capable harness such as OpenCode or OpenCode.
 4. Choose **Chat** and use a bounded prompt:
 
 ```text
@@ -29,7 +29,7 @@ Use the desktop terminal for native interactive commands. Send normal follow-up 
 The failing case is on Windows path normalization. Keep the Unix behavior unchanged.
 ```
 
-## Switch Codex Or OpenCode To Chat
+## Switch OpenCode Or OpenCode To Chat
 
 For a compatible idle TUI session, choose **Open Chat**. Open Agents stops the old controller, resumes the provider conversation through the native Chat driver, and keeps the same session and worktree.
 
@@ -45,7 +45,7 @@ Switching preserves provider context, but a first TUI-to-Chat switch does not re
 The optional CLI can start a worker and associate an existing pull request:
 
 ```bash
-open-agents spawn --project my-project --agent codex --name "Finish PR 142" --claim-pr 142
+open-agents spawn --project my-project --agent opencode --name "Finish PR 142" --claim-pr 142
 ```
 
 Or attach a pull request to an existing session:
@@ -62,7 +62,7 @@ Open Agents then observes the GitHub pull request and displays CI, review, and m
 
 ## Run A Reviewer
 
-Open a session with a linked pull request, go to **Reviews**, select a configured reviewer harness, and start a review. Reviewer runs are separate from worker harness configuration. Current reviewer harnesses include Codex and OpenCode.
+Open a session with a linked pull request, go to **Reviews**, select a configured reviewer harness, and start a review. Reviewer runs are separate from worker harness configuration. Current reviewer harnesses include OpenCode and OpenCode.
 
 Inspect the result, then send actionable findings to the worker. Keep human review in the loop before merging.
 

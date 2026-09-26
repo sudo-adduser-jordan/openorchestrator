@@ -12,7 +12,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: "Which AI coding agents are supported?",
     answer:
-      "Open Agents works with any CLI-based coding agent including OpenAI Codex, OpenCode, Cursor, Aider, Goose, and 18 more. If it runs in a terminal, it runs in Open Agents. 23 harnesses total, with per-project agent choice.",
+      "Open Agents works with any CLI-based coding agent including OpenAI OpenCode, OpenCode, Cursor, Aider, Goose, and 18 more. If it runs in a terminal, it runs in Open Agents. 23 harnesses total, with per-project agent choice.",
   },
   {
     question: "How does the parallel agent system work?",

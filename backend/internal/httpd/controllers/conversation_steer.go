@@ -80,7 +80,7 @@ func (c *ConversationsController) steerOrSend(w http.ResponseWriter, r *http.Req
 //
 // 202 rather than 200: the provider accepts the guidance and then acts on it at its
 // next model-request boundary — measured about five seconds later against
-// codex-cli 0.146.0. What changed by the time this returns is that the agent has the
+// opencode 0.146.0. What changed by the time this returns is that the agent has the
 // correction, not that it has done anything with it, and 200 would claim otherwise.
 //
 // Strictly better than the interrupt-and-resend it replaces: the turn keeps its id,

@@ -11,7 +11,7 @@ import "fmt"
 //   - SessionModeTUI: the provider's native CLI/TUI inside a terminal runtime is
 //     the only conversation controller. This is the historical behavior and the
 //     compatibility default.
-//   - SessionModeChat: Open Agents owns a structured provider controller (Codex
+//   - SessionModeChat: Open Agents owns a structured provider controller (opencode
 //     app-server today) and the terminal, if opened, is a plain worktree shell —
 //     never a second copy of the agent.
 type SessionMode string
